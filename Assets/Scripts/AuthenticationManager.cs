@@ -18,12 +18,15 @@ public class AuthenticationManager : MonoBehaviour
     public TMP_InputField loginEmailInput;
     public TMP_InputField loginPasswordInput;
     public Button loginButton;
+    public PasswordToggle loginPasswordToggle;
 
     [Header("Register Fields")]
     public TMP_InputField registerEmailInput;
     public TMP_InputField registerPasswordInput;
     public TMP_InputField repeatPasswordInput;
     public Button registerButton;
+    public PasswordToggle registerPasswordToggle;
+    public PasswordToggle repeatPasswordToggle;
 
     [Header("Switch Texts")]
     public TextMeshProUGUI switchToRegisterText;
@@ -52,6 +55,8 @@ public class AuthenticationManager : MonoBehaviour
         loginPanel.SetActive(true);
         registerPanel.SetActive(false);
         nicknamePanel.SetActive(false);
+
+        loginPasswordToggle.ResetPasswordVisibility();
     }
 
     private void ShowRegisterPanel()
@@ -59,6 +64,9 @@ public class AuthenticationManager : MonoBehaviour
         loginPanel.SetActive(false);
         registerPanel.SetActive(true);
         nicknamePanel.SetActive(false);
+
+        registerPasswordToggle.ResetPasswordVisibility();
+        repeatPasswordToggle.ResetPasswordVisibility();
     }
 
     private void ShowNicknamePanel()
@@ -73,6 +81,10 @@ public class AuthenticationManager : MonoBehaviour
         loginPanel.SetActive(false);
         registerPanel.SetActive(false);
         nicknamePanel.SetActive(false);
+
+        loginPasswordToggle.ResetPasswordVisibility();
+        registerPasswordToggle.ResetPasswordVisibility();
+        repeatPasswordToggle.ResetPasswordVisibility();
     }
 
     private async void HandleLogin()
