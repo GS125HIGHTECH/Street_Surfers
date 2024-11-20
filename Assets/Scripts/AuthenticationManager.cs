@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -12,16 +14,15 @@ public class AuthenticationManager : MonoBehaviour
     [Header("Panels")]
     public GameObject loginPanel;
     public GameObject registerPanel;
-    public GameObject nicknamePanel;
 
     [Header("Login Fields")]
-    public TMP_InputField loginEmailInput;
+    public TMP_InputField loginUsernameInput;
     public TMP_InputField loginPasswordInput;
     public Button loginButton;
     public PasswordToggle loginPasswordToggle;
 
     [Header("Register Fields")]
-    public TMP_InputField registerEmailInput;
+    public TMP_InputField registerUsernameInput;
     public TMP_InputField registerPasswordInput;
     public TMP_InputField repeatPasswordInput;
     public Button registerButton;
@@ -32,9 +33,9 @@ public class AuthenticationManager : MonoBehaviour
     public TextMeshProUGUI switchToRegisterText;
     public TextMeshProUGUI switchToLoginText;
 
-    [Header("Nickname Field")]
-    public TMP_InputField nicknameInput;
-    public Button submitNicknameButton;
+    [Header("Error Messages")]
+    public TextMeshProUGUI loginErrorText;
+    public TextMeshProUGUI registerErrorText;
 
     private async void Start()
     {
@@ -44,7 +45,6 @@ public class AuthenticationManager : MonoBehaviour
 
         loginButton.onClick.AddListener(HandleLogin);
         registerButton.onClick.AddListener(HandleRegister);
-        submitNicknameButton.onClick.AddListener(SubmitNickname);
 
         switchToRegisterText.GetComponent<Button>().onClick.AddListener(ShowRegisterPanel);
         switchToLoginText.GetComponent<Button>().onClick.AddListener(ShowLoginPanel);
@@ -54,7 +54,6 @@ public class AuthenticationManager : MonoBehaviour
     {
         loginPanel.SetActive(true);
         registerPanel.SetActive(false);
-        nicknamePanel.SetActive(false);
 
         loginPasswordToggle.ResetPasswordVisibility();
     }
@@ -63,119 +62,168 @@ public class AuthenticationManager : MonoBehaviour
     {
         loginPanel.SetActive(false);
         registerPanel.SetActive(true);
-        nicknamePanel.SetActive(false);
 
         registerPasswordToggle.ResetPasswordVisibility();
         repeatPasswordToggle.ResetPasswordVisibility();
-    }
-
-    private void ShowNicknamePanel()
-    {
-        loginPanel.SetActive(false);
-        registerPanel.SetActive(false);
-        nicknamePanel.SetActive(true);
     }
 
     private void ShowGame()
     {
         loginPanel.SetActive(false);
         registerPanel.SetActive(false);
-        nicknamePanel.SetActive(false);
 
         loginPasswordToggle.ResetPasswordVisibility();
         registerPasswordToggle.ResetPasswordVisibility();
         repeatPasswordToggle.ResetPasswordVisibility();
     }
 
-    private async void HandleLogin()
+    private void HighlightInputField(TMP_InputField inputField, Color color)
     {
-        string email = loginEmailInput.text;
-        string password = loginPasswordInput.text;
-
-        try
+        if (inputField.TryGetComponent<Outline>(out var outline))
         {
-            await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(email, password);
-            Debug.Log("Login successful!");
+            outline.effectColor = color;
+            outline.enabled = true;
 
-            bool nicknameExists = await CheckIfNicknameExists();
-
-            if (nicknameExists)
-            {
-                ShowGame();
-            }
-            else
-            {
-                ShowNicknamePanel();
-            }
-        }
-        catch (AuthenticationException e)
-        {
-            Debug.LogError($"Login failed: {e.Message}");
+            StartCoroutine(RemoveHighlightCoroutine(outline, 5f));
         }
     }
 
-    private async Task<bool> CheckIfNicknameExists()
+    private IEnumerator RemoveHighlightCoroutine(Outline outline, float delay)
     {
+        yield return new WaitForSeconds(delay);
+        if (outline != null)
+        {
+            outline.enabled = false;
+        }
+    }
+
+    private void ResetInputFieldHighlight(TMP_InputField inputField)
+    {
+        if (inputField.TryGetComponent<Outline>(out var outline))
+        {
+            outline.effectColor = Color.clear;
+            outline.enabled = false;
+        }
+    }
+
+    private async void HandleLogin()
+    {
+        string username = loginUsernameInput.text;
+        string password = loginPasswordInput.text;
+
+        ResetInputFieldHighlight(loginUsernameInput);
+        ResetInputFieldHighlight(loginPasswordInput);
+        loginErrorText.text = "";
+
+        if (string.IsNullOrEmpty(username))
+        {
+            HighlightInputField(loginUsernameInput, Color.red);
+            loginErrorText.text = "Username cannot be empty.";
+            StartCoroutine(ClearErrorMessageAfterDelay(loginErrorText, 5f));
+            return;
+        }
+
+        if (string.IsNullOrEmpty(password))
+        {
+            HighlightInputField(loginPasswordInput, Color.red);
+            loginErrorText.text = "Password cannot be empty.";
+            StartCoroutine(ClearErrorMessageAfterDelay(loginErrorText, 5f));
+            return;
+        }
+
         try
         {
-            var result = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "nickname" });
+            await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username, password);
+            Debug.Log("Login successful!");
 
-            return result.ContainsKey("nickname") && !string.IsNullOrEmpty(result["nickname"].Value.GetAsString());
+            ShowGame();
         }
-        catch (CloudSaveException e)
+        catch (Exception e)
         {
-            Debug.LogError($"Error checking nickname: {e.Message}");
-            return false;
+            HandleException(e, loginErrorText);
         }
     }
 
     private async void HandleRegister()
     {
-        string email = registerEmailInput.text;
+        string username = registerUsernameInput.text;
         string password = registerPasswordInput.text;
         string repeatPassword = repeatPasswordInput.text;
 
+        ResetInputFieldHighlight(registerUsernameInput);
+        ResetInputFieldHighlight(registerPasswordInput);
+        ResetInputFieldHighlight(repeatPasswordInput);
+        registerErrorText.text = "";
+
+        if (string.IsNullOrEmpty(username))
+        {
+            HighlightInputField(registerUsernameInput, Color.red);
+            registerErrorText.text = "Username cannot be empty.";
+            StartCoroutine(ClearErrorMessageAfterDelay(registerErrorText, 5f));
+            return;
+        }
+
+        if (string.IsNullOrEmpty(password))
+        {
+            HighlightInputField(registerPasswordInput, Color.red);
+            registerErrorText.text = "Password cannot be empty.";
+            StartCoroutine(ClearErrorMessageAfterDelay(registerErrorText, 5f));
+            return;
+        }
+
+        if (string.IsNullOrEmpty(repeatPassword))
+        {
+            HighlightInputField(repeatPasswordInput, Color.red);
+            registerErrorText.text = "Repeat password cannot be empty.";
+            StartCoroutine(ClearErrorMessageAfterDelay(registerErrorText, 5f));
+            return;
+        }
+
         if (password != repeatPassword)
         {
-            Debug.Log("Passwords do not match.");
+            HighlightInputField(registerPasswordInput, Color.red);
+            HighlightInputField(repeatPasswordInput, Color.red);
+            registerErrorText.text = "Passwords do not match.";
+            StartCoroutine(ClearErrorMessageAfterDelay(registerErrorText, 5f));
             return;
         }
 
         try
         {
-            await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(email, password);
+            await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(username, password);
             Debug.Log("Registration successful!");
 
-            ShowNicknamePanel();
+            var data = new Dictionary<string, object> { { "username", username } };
+            await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+            Debug.Log("Username saved to Cloud Save!");
+
+            ShowGame();
         }
-        catch (AuthenticationException e)
+        catch (Exception e)
         {
-            Debug.LogError($"Registration failed: {e.Message}");
+            HandleException(e, registerErrorText);
         }
     }
 
-    private async void SubmitNickname()
+    private IEnumerator ClearErrorMessageAfterDelay(TextMeshProUGUI errorText, float delay)
     {
-        string nickname = nicknameInput.text;
+        yield return new WaitForSeconds(delay);
+        errorText.text = "";
+    }
 
-        if (string.IsNullOrEmpty(nickname))
+    private void HandleException(Exception e, TextMeshProUGUI errorText)
+    {
+        if (e is AuthenticationException authException)
         {
-            Debug.Log("Please enter a valid nickname.");
-            return;
+            errorText.text = $"Authentication failed: {authException.Message}";
         }
-
-        try
+        else if (e is RequestFailedException requestFailedException)
         {
-            var data = new Dictionary<string, object> { { "nickname", nickname } };
-            await CloudSaveService.Instance.Data.Player.SaveAsync(data);
-            Debug.Log("Nickname saved to Cloud Save!");
-
-            ShowGame();
-
+            errorText.text = $"Request failed: {requestFailedException.Message}";
         }
-        catch (CloudSaveException e)
+        else
         {
-            Debug.LogError($"Failed to save nickname: {e.Message}");
+            errorText.text = $"Unexpected error: {e.Message}";
         }
     }
 }
