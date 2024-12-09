@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
@@ -9,11 +10,21 @@ public class GameManager : MonoBehaviour
     public GameObject roadPrefab;
     public GameObject carPrefab;
 
-    public float spawnInterval = 5f; 
-    public float segmentLength = 2f; 
+    public float spawnInterval = 10f; 
+    public float segmentLength = 2f;
 
+    public int maxSegmentsAhead = 100;
+    public float maxVisibleDistance = 200f;
+
+    private readonly Queue<GameObject> roadSegments = new();
     private Vector3 nextSpawnPosition;
-    private bool canSpawn = false;
+    private Camera mainCamera;
+
+    private void Awake()
+    {
+        Application.targetFrameRate = 60;
+        mainCamera = Camera.main;
+    }
 
     private void OnEnable()
     {
@@ -29,7 +40,13 @@ public class GameManager : MonoBehaviour
     {
         SpawnCar();
 
-        canSpawn = true;
+        nextSpawnPosition = new Vector3(0, 0, -10);
+
+        for (int i = 0; i < maxSegmentsAhead; i++)
+        {
+            SpawnRoadSegment();
+        }
+
         InvokeRepeating(nameof(SpawnRoadSegment), 0f, spawnInterval);
     }
 
@@ -40,8 +57,7 @@ public class GameManager : MonoBehaviour
 
         GameObject car = Instantiate(carPrefab, carStartPosition, carRotation);
 
-        CameraFollow cameraFollow = Camera.main.GetComponent<CameraFollow>();
-        if (cameraFollow != null)
+        if (mainCamera.TryGetComponent<CameraFollow>(out var cameraFollow))
         {
             cameraFollow.target = car.transform;
         }
@@ -49,9 +65,30 @@ public class GameManager : MonoBehaviour
 
     private void SpawnRoadSegment()
     {
-        if (!canSpawn) return;
+        RemoveOldSegments();
 
-        Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
+        if (roadSegments.Count >= maxSegmentsAhead || (nextSpawnPosition.z - mainCamera.transform.position.z) > maxVisibleDistance)
+        {
+            return;
+        }
+
+        GameObject segment = Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
+        roadSegments.Enqueue(segment);
+
         nextSpawnPosition += new Vector3(0, 0, segmentLength);
+    }
+
+    private void RemoveOldSegments()
+    {
+         if (roadSegments.Count > 0)
+        {
+            GameObject oldestSegment = roadSegments.Peek();
+
+            if (oldestSegment.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                roadSegments.Dequeue();
+                Destroy(oldestSegment);
+            }
+        }
     }
 }
