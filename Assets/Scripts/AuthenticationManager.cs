@@ -37,6 +37,8 @@ public class AuthenticationManager : MonoBehaviour
     public TextMeshProUGUI loginErrorText;
     public TextMeshProUGUI registerErrorText;
 
+    public static event Action OnGameShown;
+
     private async void Start()
     {
         await UnityServices.InitializeAsync();
@@ -75,6 +77,8 @@ public class AuthenticationManager : MonoBehaviour
         loginPasswordToggle.ResetPasswordVisibility();
         registerPasswordToggle.ResetPasswordVisibility();
         repeatPasswordToggle.ResetPasswordVisibility();
+
+        OnGameShown?.Invoke();
     }
 
     private void HighlightInputField(TMP_InputField inputField, Color color)
