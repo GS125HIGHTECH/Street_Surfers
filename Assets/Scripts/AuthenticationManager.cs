@@ -37,19 +37,28 @@ public class AuthenticationManager : MonoBehaviour
     public TextMeshProUGUI loginErrorText;
     public TextMeshProUGUI registerErrorText;
 
+    [Header("Checkbox")]
+    public Toggle saveLoginToggle;
+    public Toggle saveRegisterToggle;
+
     public static event Action OnGameShown;
 
     private async void Start()
     {
+        saveLoginToggle.isOn = false;
+        saveRegisterToggle.isOn = false;
+
         await UnityServices.InitializeAsync();
 
-        ShowRegisterPanel();
+        ShowLoginPanel();
 
         loginButton.onClick.AddListener(HandleLogin);
         registerButton.onClick.AddListener(HandleRegister);
 
         switchToRegisterText.GetComponent<Button>().onClick.AddListener(ShowRegisterPanel);
         switchToLoginText.GetComponent<Button>().onClick.AddListener(ShowLoginPanel);
+
+        LoadSavedLoginData();
     }
 
     private void ShowLoginPanel()
@@ -140,6 +149,11 @@ public class AuthenticationManager : MonoBehaviour
             await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username, password);
             Debug.Log("Login successful!");
 
+            if (saveLoginToggle.isOn)
+            {
+                SaveLoginData(username, password);
+            }
+
             ShowGame();
         }
         catch (Exception e)
@@ -201,11 +215,35 @@ public class AuthenticationManager : MonoBehaviour
             await CloudSaveService.Instance.Data.Player.SaveAsync(data);
             Debug.Log("Username saved to Cloud Save!");
 
+            if (saveRegisterToggle.isOn)
+            {
+                SaveLoginData(username, password);
+            }
+
             ShowGame();
         }
         catch (Exception e)
         {
             HandleException(e, registerErrorText);
+        }
+    }
+
+    private void SaveLoginData(string username, string password)
+    {
+        PlayerPrefs.SetString("savedUsername", username);
+        PlayerPrefs.SetString("savedPassword", password);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadSavedLoginData()
+    {
+        if (PlayerPrefs.HasKey("savedUsername") && PlayerPrefs.HasKey("savedPassword"))
+        {
+            string savedUsername = PlayerPrefs.GetString("savedUsername");
+            string savedPassword = PlayerPrefs.GetString("savedPassword");
+
+            loginUsernameInput.text = savedUsername;
+            loginPasswordInput.text = savedPassword;
         }
     }
 
