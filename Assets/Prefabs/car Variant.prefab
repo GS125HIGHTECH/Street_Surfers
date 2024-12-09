@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -3193204252992524555, guid: 0a8646eecbe221345b3aceccd59336f5, type: 3}
       propertyPath: wheelTurnAngle
-      value: 15
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1163881575033482455, guid: 0a8646eecbe221345b3aceccd59336f5, type: 3}
       propertyPath: m_Name
