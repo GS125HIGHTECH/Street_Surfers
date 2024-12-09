@@ -1199,7 +1199,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.13052616, y: 0, z: 0, w: 0.9914449}
-  m_LocalPosition: {x: 0, y: 7, z: -25}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1262,7 +1262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  offset: {x: 0, y: 5, z: -15}
+  offset: {x: 0, y: 5, z: -5}
 --- !u!1 &384716392
 GameObject:
   m_ObjectHideFlags: 0
@@ -1935,7 +1935,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roadPrefab: {fileID: 4686875392196472533, guid: e8ff23b06aceb9f42a833e256c861575, type: 3}
-  carPrefab: {fileID: 1163881575033482455, guid: 0a8646eecbe221345b3aceccd59336f5, type: 3}
+  carPrefab: {fileID: 4398438015836205041, guid: 7bf76a95e82adfa40bfd4bd73b7b48ff, type: 3}
   spawnInterval: 0.5
   segmentLength: 2
 --- !u!1 &824196596
