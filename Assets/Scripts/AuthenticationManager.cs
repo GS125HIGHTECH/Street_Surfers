@@ -42,6 +42,7 @@ public class AuthenticationManager : MonoBehaviour
     public Toggle saveRegisterToggle;
 
     public static event Action OnGameShown;
+    public static event Action OnLoggedIn;
 
     private async void Start()
     {
@@ -54,6 +55,8 @@ public class AuthenticationManager : MonoBehaviour
 
         switchToRegisterText.GetComponent<Button>().onClick.AddListener(ShowRegisterPanel);
         switchToLoginText.GetComponent<Button>().onClick.AddListener(ShowLoginPanel);
+
+        GameManager.Instance.coinsPanel.SetActive(false);
 
         LoadSavedLoginData();
     }
@@ -85,6 +88,8 @@ public class AuthenticationManager : MonoBehaviour
         repeatPasswordToggle.ResetPasswordVisibility();
 
         OnGameShown?.Invoke();
+        OnLoggedIn?.Invoke();
+        GameManager.Instance.coinsPanel.SetActive(true);
     }
 
     private void HighlightInputField(TMP_InputField inputField, Color color)
