@@ -97,6 +97,8 @@ public class CarController : MonoBehaviour
 
     private IEnumerator SmoothChangeLane(float targetX)
     {
+        AudioManager.Instance.PlayTiresSound();
+
         isChangingLane = true;
 
         Vector3 startPosition = transform.position;

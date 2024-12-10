@@ -63,11 +63,30 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         AuthenticationManager.OnGameShown += StartSpawning;
+        AuthenticationManager.OnLoggedIn += OnLoggedIn;
     }
 
     private void OnDisable()
     {
         AuthenticationManager.OnGameShown -= StartSpawning;
+        AuthenticationManager.OnLoggedIn -= OnLoggedIn;
+    }
+
+    private async void OnLoggedIn()
+    {
+        isLoggedIn = true;
+        Debug.Log("Login successful!");
+
+        AudioManager.Instance.PlayEngineSound();
+
+        try
+        {
+            await InitializeCloudSave();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error initializing Unity Services: {e.Message}");
+        }
     }
 
     private async Task InitializeCloudSave()
@@ -135,7 +154,6 @@ public class GameManager : MonoBehaviour
         {
             SpawnCoins(nextSpawnPosition);
         }
-        Debug.Log(nextSpawnPosition);
         nextSpawnPosition += new Vector3(0, 0, segmentLength);
     }
 
