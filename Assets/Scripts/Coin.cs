@@ -11,6 +11,8 @@ public class Coin : MonoBehaviour
             AudioManager.Instance.PlayCoinCollectSound();
 
             Debug.Log("Coin collected!");
+
+            GameManager.Instance.AddCoin();
         }
     }
 }
