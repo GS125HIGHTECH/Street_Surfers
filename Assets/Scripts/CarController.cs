@@ -8,7 +8,10 @@ public class CarController : MonoBehaviour
     public Transform wheelFR;
     public Transform wheelRL;
     public Transform wheelRR;
-    private readonly float speed = 2.5f;
+
+    [SerializeField]
+    private float currentSpeed = 2.5f;
+
     private readonly float wheelRotationSpeed = 90f;
     private readonly float laneChangeDuration = 1f;
     private readonly float tiltAngle = 10f;
@@ -21,11 +24,12 @@ public class CarController : MonoBehaviour
     private void Start()
     {
         isMobile = Application.isMobilePlatform;
+        StartCoroutine(IncreaseSpeedOverTime());
     }
 
     private void Update()
     {
-        transform.Translate(Vector3.right * speed * Time.deltaTime);
+        transform.Translate(currentSpeed * Time.deltaTime * Vector3.right);
 
         RotateWheels();
 
@@ -96,6 +100,7 @@ public class CarController : MonoBehaviour
         isChangingLane = true;
 
         Vector3 startPosition = transform.position;
+        float initialZ = startPosition.z;
         Vector3 targetPosition = new (targetX, startPosition.y, startPosition.z);
 
         float elapsedTime = 0f;
@@ -105,7 +110,10 @@ public class CarController : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / laneChangeDuration;
 
+            float dynamicZ = initialZ + currentSpeed * elapsedTime;
+
             transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+            transform.position = new (transform.position.x, transform.position.y, dynamicZ);
 
             float tilt = Mathf.Sin(t * Mathf.PI) * tiltAngle * Mathf.Sign(targetX - startPosition.x);
             transform.rotation = Quaternion.Euler(0, -90f + tilt, tilt / 10f);
@@ -136,13 +144,19 @@ public class CarController : MonoBehaviour
             yield return null;
         }
 
-        transform.position = targetPosition;
-        transform.rotation = Quaternion.Euler(0, -90f, 0);
-
+        transform.SetPositionAndRotation(new (targetPosition.x, transform.position.y, transform.position.z), Quaternion.Euler(0, -90f, 0));
         if (wheelFL) wheelFL.localRotation = Quaternion.Euler(wheelFL.localRotation.eulerAngles.x, -270f, 0);
         if (wheelFR) wheelFR.localRotation = Quaternion.Euler(wheelFR.localRotation.eulerAngles.x, -270f, 0);
 
         isChangingLane = false;
     }
 
+    private IEnumerator IncreaseSpeedOverTime()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+            currentSpeed += 0.2f;
+        }
+    }
 }
