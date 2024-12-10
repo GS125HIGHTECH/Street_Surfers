@@ -4,15 +4,14 @@ using UnityEngine.InputSystem;
 
 public class CarController : MonoBehaviour
 {
-    public float speed = 1f;
     public Transform wheelFL;
     public Transform wheelFR;
     public Transform wheelRL;
     public Transform wheelRR;
-    public float wheelRotationSpeed = 90f;
-    public float laneChangeDuration = 0.5f;
-    public float wheelTurnAngle = 30f;
-    public float tiltAngle = 10f;
+    private readonly float speed = 2.5f;
+    private readonly float wheelRotationSpeed = 90f;
+    private readonly float laneChangeDuration = 1f;
+    private readonly float tiltAngle = 10f;
 
     private readonly float[] lanes = { -7f, 0f, 7f };
     private int currentLaneIndex = 1;
@@ -97,7 +96,7 @@ public class CarController : MonoBehaviour
         isChangingLane = true;
 
         Vector3 startPosition = transform.position;
-        Vector3 targetPosition = new Vector3(targetX, startPosition.y, startPosition.z);
+        Vector3 targetPosition = new (targetX, startPosition.y, startPosition.z);
 
         float elapsedTime = 0f;
 
@@ -112,8 +111,7 @@ public class CarController : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, -90f + tilt, tilt / 10f);
 
             float halfDuration = laneChangeDuration / 2f;
-            float wheelTurnY = -270f;
-
+            float wheelTurnY;
             if (elapsedTime <= halfDuration)
             {
                 wheelTurnY = Mathf.Lerp(
