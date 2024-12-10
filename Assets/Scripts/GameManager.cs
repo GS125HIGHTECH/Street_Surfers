@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
 using Unity.Services.Core;
@@ -7,6 +8,10 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
+    public GameObject coinsPanel;
+
     public GameObject roadPrefab;
     public GameObject carPrefab;
     public GameObject coinPrefab;
@@ -21,11 +26,39 @@ public class GameManager : MonoBehaviour
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
+    private int coinCount = 0;
+    public bool isLoggedIn = false;
+
     private void Awake()
     {
         Application.targetFrameRate = 60;
         mainCamera = Camera.main;
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
+
+    public async void AddCoin()
+    {
+        coinCount++;
+
+        var data = new Dictionary<string, object> { { "coins", coinCount } };
+        await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+
+        Debug.Log($"Coins: {coinCount}");
+    }
+
+    public int GetCoinCount()
+    {
+        return coinCount;
+    }
+
 
     private void OnEnable()
     {
@@ -35,6 +68,28 @@ public class GameManager : MonoBehaviour
     private void OnDisable()
     {
         AuthenticationManager.OnGameShown -= StartSpawning;
+    }
+
+    private async Task InitializeCloudSave()
+    {
+        try
+        {
+            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "coins" });
+
+            if (playerData.TryGetValue("coins", out var coinsData))
+            {
+                coinCount = coinsData.Value.GetAs<int>();
+                Debug.Log($"Coins loaded: {coinCount}");
+            }
+            else
+            {
+                Debug.LogError("The 'coins' data could not be found.");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error loading cloud save data: {e.Message}");
+        }
     }
 
     private void StartSpawning()
