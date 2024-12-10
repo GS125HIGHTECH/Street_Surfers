@@ -11,12 +11,13 @@ public class GameManager : MonoBehaviour
     public GameObject carPrefab;
     public GameObject coinPrefab;
 
-    public float spawnInterval = 10f; 
-    public float segmentLength = 2f;
+    private readonly float spawnInterval = 0.1f; 
+    private readonly float segmentLength = 2f;
 
-    public int maxSegmentsAhead = 100;
+    private readonly int maxSegmentsAhead = 200;
 
     private readonly Queue<GameObject> roadSegments = new();
+    private readonly Queue<GameObject> coins = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
@@ -65,7 +66,7 @@ public class GameManager : MonoBehaviour
 
     private void SpawnRoadSegment()
     {
-        RemoveOldSegments();
+        RemoveOldObjects();
 
         if (roadSegments.Count >= maxSegmentsAhead)
         {
@@ -75,12 +76,17 @@ public class GameManager : MonoBehaviour
         GameObject segment = Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
         roadSegments.Enqueue(segment);
 
+        if (nextSpawnPosition.z % 25 == 0 && nextSpawnPosition.z > 10)
+        {
+            SpawnCoins(nextSpawnPosition);
+        }
+        Debug.Log(nextSpawnPosition);
         nextSpawnPosition += new Vector3(0, 0, segmentLength);
     }
 
-    private void RemoveOldSegments()
+    private void RemoveOldObjects()
     {
-         if (roadSegments.Count > 0)
+        if (roadSegments.Count > 0)
         {
             GameObject oldestSegment = roadSegments.Peek();
 
@@ -88,6 +94,49 @@ public class GameManager : MonoBehaviour
             {
                 roadSegments.Dequeue();
                 Destroy(oldestSegment);
+            }
+        }
+
+        if (coins.Count > 0)
+        {
+            GameObject oldestCoin = coins.Peek();
+
+            if (oldestCoin == null || oldestCoin.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                coins.Dequeue();
+                if (oldestCoin != null)
+                {
+                    Destroy(oldestCoin);
+                }
+            }
+        }
+    }
+
+    private void SpawnCoins(Vector3 startPosition)
+    {
+        int numColumns = UnityEngine.Random.Range(0, 3);
+
+        int[] linePositions = { -7, 0, 7 };
+        List<int> selectedLines = new();
+
+        while (selectedLines.Count < numColumns)
+        {
+            int randomLine = linePositions[UnityEngine.Random.Range(0, linePositions.Length)];
+            if (!selectedLines.Contains(randomLine))
+            {
+                selectedLines.Add(randomLine);
+            }
+        }
+
+        foreach (int line in selectedLines)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Vector3 coinPosition = startPosition + new Vector3(line, 1.2f, i * segmentLength);
+                GameObject coin = Instantiate(coinPrefab, coinPosition, Quaternion.Euler(90f, 0, 0));
+
+                coins.Enqueue(coin);
+                coin.AddComponent<Coin>();
             }
         }
     }
