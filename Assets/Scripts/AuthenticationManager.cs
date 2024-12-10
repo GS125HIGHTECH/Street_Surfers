@@ -45,9 +45,6 @@ public class AuthenticationManager : MonoBehaviour
 
     private async void Start()
     {
-        saveLoginToggle.isOn = false;
-        saveRegisterToggle.isOn = false;
-
         await UnityServices.InitializeAsync();
 
         ShowLoginPanel();
