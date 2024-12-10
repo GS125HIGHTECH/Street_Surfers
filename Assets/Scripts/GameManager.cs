@@ -9,12 +9,12 @@ public class GameManager : MonoBehaviour
 {
     public GameObject roadPrefab;
     public GameObject carPrefab;
+    public GameObject coinPrefab;
 
     public float spawnInterval = 10f; 
     public float segmentLength = 2f;
 
     public int maxSegmentsAhead = 100;
-    public float maxVisibleDistance = 200f;
 
     private readonly Queue<GameObject> roadSegments = new();
     private Vector3 nextSpawnPosition;
@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
     {
         RemoveOldSegments();
 
-        if (roadSegments.Count >= maxSegmentsAhead || (nextSpawnPosition.z - mainCamera.transform.position.z) > maxVisibleDistance)
+        if (roadSegments.Count >= maxSegmentsAhead)
         {
             return;
         }
