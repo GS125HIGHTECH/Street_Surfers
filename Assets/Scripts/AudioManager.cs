@@ -5,6 +5,8 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance { get; private set; }
 
     [SerializeField] private AudioClip coinCollectSound;
+    [SerializeField] private AudioClip clickSound;
+
     [SerializeField] private AudioSource audioSource;
 
     private float lastPlayTime;
@@ -28,6 +30,14 @@ public class AudioManager : MonoBehaviour
         {
             audioSource.PlayOneShot(coinCollectSound);
             lastPlayTime = Time.time;
+        }
+    }
+
+    public void PlayClickSound()
+    {
+        if (clickSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clickSound);
         }
     }
 }
