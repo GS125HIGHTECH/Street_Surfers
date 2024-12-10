@@ -1,23 +1,30 @@
 fileFormatVersion: 2
-guid: 8ccd2dddbbcc0b04cb972c5268daa04d
+guid: 61ad195ee0adbcf43a81943f1745cb23
+timeCreated: 1532255319
+licenseType: Store
 AudioImporter:
-  externalObjects: {}
-  serializedVersion: 8
+  serializedVersion: 6
   defaultSettings:
-    serializedVersion: 2
     loadType: 0
     sampleRateSetting: 0
     sampleRateOverride: 44100
     compressionFormat: 1
     quality: 1
     conversionMode: 0
-    preloadAudioData: 0
   platformSettingOverrides: {}
   forceToMono: 0
   normalize: 1
+  preloadAudioData: 1
   loadInBackground: 0
   ambisonic: 0
   3D: 1
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 123836
+  packageName: ENGINES
+  packageVersion: 1.0
+  assetPath: Assets/Engines/Misc SFX/Smashed_Window_02.wav
+  uploadId: 257114
