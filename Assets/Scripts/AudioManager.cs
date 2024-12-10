@@ -2,15 +2,32 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static AudioManager Instance { get; private set; }
+
+    [SerializeField] private AudioClip coinCollectSound;
+    [SerializeField] private AudioSource audioSource;
+
+    private float lastPlayTime;
+    private const float minPlayInterval = 0.1f;
+
+    private void Awake()
     {
-        
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void PlayCoinCollectSound()
     {
-        
+        if (coinCollectSound != null && audioSource != null && Time.time >= lastPlayTime + minPlayInterval)
+        {
+            audioSource.PlayOneShot(coinCollectSound);
+            lastPlayTime = Time.time;
+        }
     }
 }
