@@ -5,6 +5,7 @@ using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
 using Unity.Services.Core;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -31,6 +32,8 @@ public class GameManager : MonoBehaviour
 
     private int coinCount = 0;
     public bool isLoggedIn = false;
+
+    private bool isGamePaused = false;
 
     private void Awake()
     {
@@ -240,5 +243,20 @@ public class GameManager : MonoBehaviour
 
         streetLamps.Enqueue(leftLamp);
         streetLamps.Enqueue(rightLamp);
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            TogglePause();
+        }
+    }
+
+    private void TogglePause()
+    {
+        isGamePaused = !isGamePaused;
+        Time.timeScale = isGamePaused ? 0 : 1;
+        Debug.Log(isGamePaused ? "Game Paused" : "Game Resumed");
     }
 }
