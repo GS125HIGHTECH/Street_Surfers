@@ -221,7 +221,7 @@ public class GameManager : MonoBehaviour
         {
             for (int i = 0; i < 5; i++)
             {
-                Vector3 coinPosition = startPosition + new Vector3(line, 1f, i * ( segmentLength / 4.0f));
+                Vector3 coinPosition = startPosition + new Vector3(line, 1.3f, i * ( segmentLength / 4.0f));
                 GameObject coin = Instantiate(coinPrefab, coinPosition, Quaternion.Euler(0, 0, 0));
 
                 coins.Enqueue(coin);
