@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     public GameObject coinPrefab;
 
     private readonly float spawnInterval = 0.1f; 
-    private readonly float segmentLength = 2f;
+    private readonly float segmentLength = 20f;
 
     private readonly int maxSegmentsAhead = 200;
 
@@ -189,7 +189,7 @@ public class GameManager : MonoBehaviour
     {
         int numColumns = UnityEngine.Random.Range(0, 3);
 
-        int[] linePositions = { -7, 0, 7 };
+        int[] linePositions = { -8, 0, 8 };
         List<int> selectedLines = new();
 
         while (selectedLines.Count < numColumns)
