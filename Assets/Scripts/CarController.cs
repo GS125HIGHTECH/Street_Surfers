@@ -16,7 +16,7 @@ public class CarController : MonoBehaviour
     private readonly float laneChangeDuration = 1f;
     private readonly float tiltAngle = 10f;
 
-    private readonly float[] lanes = { -7f, 0f, 7f };
+    private readonly float[] lanes = { -8f, 0f, 8f };
     private int currentLaneIndex = 1;
     private bool isMobile = false;
     private bool isChangingLane = false;

@@ -5,6 +5,7 @@ using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
 using Unity.Services.Core;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,19 +16,24 @@ public class GameManager : MonoBehaviour
     public GameObject roadPrefab;
     public GameObject carPrefab;
     public GameObject coinPrefab;
+    public GameObject streetLampPrefab;
+
 
     private readonly float spawnInterval = 0.1f; 
-    private readonly float segmentLength = 2f;
+    private readonly float segmentLength = 20f;
 
-    private readonly int maxSegmentsAhead = 200;
+    private readonly int maxSegmentsAhead = 40;
 
     private readonly Queue<GameObject> roadSegments = new();
     private readonly Queue<GameObject> coins = new();
+    private readonly Queue<GameObject> streetLamps = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
     private int coinCount = 0;
     public bool isLoggedIn = false;
+
+    private bool isGamePaused = false;
 
     private void Awake()
     {
@@ -150,10 +156,12 @@ public class GameManager : MonoBehaviour
         GameObject segment = Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
         roadSegments.Enqueue(segment);
 
-        if (nextSpawnPosition.z % 25 == 0 && nextSpawnPosition.z > 10)
+        if (nextSpawnPosition.z % 3 == 0 && nextSpawnPosition.z > 10)
         {
             SpawnCoins(nextSpawnPosition);
+            SpawnStreetLamps(nextSpawnPosition);
         }
+
         nextSpawnPosition += new Vector3(0, 0, segmentLength);
     }
 
@@ -183,13 +191,24 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+
+        if (streetLamps.Count > 0)
+        {
+            GameObject oldestLamp = streetLamps.Peek();
+
+            if (oldestLamp.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                streetLamps.Dequeue();
+                Destroy(oldestLamp);
+            }
+        }
     }
 
     private void SpawnCoins(Vector3 startPosition)
     {
         int numColumns = UnityEngine.Random.Range(0, 3);
 
-        int[] linePositions = { -7, 0, 7 };
+        int[] linePositions = { -8, 0, 8 };
         List<int> selectedLines = new();
 
         while (selectedLines.Count < numColumns)
@@ -205,12 +224,39 @@ public class GameManager : MonoBehaviour
         {
             for (int i = 0; i < 5; i++)
             {
-                Vector3 coinPosition = startPosition + new Vector3(line, 1.2f, i * segmentLength);
-                GameObject coin = Instantiate(coinPrefab, coinPosition, Quaternion.Euler(90f, 0, 0));
+                Vector3 coinPosition = startPosition + new Vector3(line, 1.3f, i * ( segmentLength / 4.0f));
+                GameObject coin = Instantiate(coinPrefab, coinPosition, Quaternion.Euler(0, 0, 0));
 
                 coins.Enqueue(coin);
                 coin.AddComponent<Coin>();
             }
         }
+    }
+
+    private void SpawnStreetLamps(Vector3 position)
+    {
+        Vector3 leftLampPosition = position + new Vector3(-11.95f, 0, 0);
+        Vector3 rightLampPosition = position + new Vector3(11.95f, 0, 0);
+
+        GameObject leftLamp = Instantiate(streetLampPrefab, leftLampPosition, Quaternion.Euler(0, 90f, 0));
+        GameObject rightLamp = Instantiate(streetLampPrefab, rightLampPosition, Quaternion.Euler(0, -90f, 0));
+
+        streetLamps.Enqueue(leftLamp);
+        streetLamps.Enqueue(rightLamp);
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            TogglePause();
+        }
+    }
+
+    private void TogglePause()
+    {
+        isGamePaused = !isGamePaused;
+        Time.timeScale = isGamePaused ? 0 : 1;
+        Debug.Log(isGamePaused ? "Game Paused" : "Game Resumed");
     }
 }
