@@ -12,12 +12,14 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public GameObject coinsPanel;
+    public GameObject menuPanel;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
     public GameObject coinPrefab;
     public GameObject streetLampPrefab;
 
+    private GameObject currentCar;
 
     private readonly float spawnInterval = 0.1f; 
     private readonly float segmentLength = 20f;
@@ -32,8 +34,6 @@ public class GameManager : MonoBehaviour
 
     private int coinCount = 0;
     public bool isLoggedIn = false;
-
-    private bool isGamePaused = false;
 
     private void Awake()
     {
@@ -81,7 +81,6 @@ public class GameManager : MonoBehaviour
     private async void OnLoggedIn()
     {
         isLoggedIn = true;
-        Debug.Log("Login successful!");
 
         AudioManager.Instance.PlayEngineSound();
 
@@ -142,11 +141,11 @@ public class GameManager : MonoBehaviour
         Vector3 carStartPosition = new(0, 0, 0);
         Quaternion carRotation = Quaternion.Euler(0, -90, 0);
 
-        GameObject car = Instantiate(carPrefab, carStartPosition, carRotation);
+        currentCar = Instantiate(carPrefab, carStartPosition, carRotation);
 
         if (mainCamera.TryGetComponent<CameraFollow>(out var cameraFollow))
         {
-            cameraFollow.target = car.transform;
+            cameraFollow.target = currentCar.transform;
         }
     }
 
@@ -274,17 +273,46 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0;
         AudioManager.Instance.StopEngineSound();
     }
-    {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            TogglePause();
-        }
-    }
 
-    private void TogglePause()
+    public void LogOut()
     {
-        isGamePaused = !isGamePaused;
-        Time.timeScale = isGamePaused ? 0 : 1;
-        Debug.Log(isGamePaused ? "Game Paused" : "Game Resumed");
+        HideMenu();
+        coinsPanel.SetActive(false);
+
+        coinCount = 0;
+
+        foreach (var segment in roadSegments)
+        {
+            Destroy(segment);
+        }
+        roadSegments.Clear();
+
+        foreach (var coin in coins)
+        {
+            Destroy(coin);
+        }
+        coins.Clear();
+
+        foreach (var lamp in streetLamps)
+        {
+            Destroy(lamp);
+        }
+        streetLamps.Clear();
+
+        if (currentCar != null)
+        {
+            Destroy(currentCar);
+            currentCar = null;
+        }
+
+        nextSpawnPosition = Vector3.zero;
+        mainCamera.transform.position = nextSpawnPosition;
+
+        CancelInvoke(nameof(SpawnRoadSegment));
+        AudioManager.Instance.StopEngineSound();
+
+        AuthenticationService.Instance.SignOut();
+
+        AuthenticationManager.Instance.ShowLoginPanel();
     }
 }
