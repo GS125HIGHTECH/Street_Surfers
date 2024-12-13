@@ -54,19 +54,24 @@ public class CarController : MonoBehaviour
 
     private void HandleMobileSwipe()
     {
-        if (Touchscreen.current.primaryTouch.press.isPressed)
-        {
-            Vector2 swipeDelta = Touchscreen.current.primaryTouch.delta.ReadValue();
+        float swipeThreshold = 50f;
 
-            if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y))
+        if (!GameManager.Instance.menuPanel.activeSelf && !GameManager.Instance.settingsPanel.activeSelf)
+        {
+            if (Touchscreen.current.primaryTouch.press.isPressed)
             {
-                if (swipeDelta.x > 0)
+                Vector2 swipeDelta = Touchscreen.current.primaryTouch.delta.ReadValue();
+
+                if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y) && Mathf.Abs(swipeDelta.x) > swipeThreshold)
                 {
-                    ChangeLane(1);
-                }
-                else
-                {
-                    ChangeLane(-1);
+                    if (swipeDelta.x > 0)
+                    {
+                        ChangeLane(1);
+                    }
+                    else
+                    {
+                        ChangeLane(-1);
+                    }
                 }
             }
         }
@@ -74,13 +79,16 @@ public class CarController : MonoBehaviour
 
     private void HandleKeyboardInput()
     {
-        if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
+        if (!GameManager.Instance.menuPanel.activeSelf && !GameManager.Instance.settingsPanel.activeSelf)
         {
-            ChangeLane(1);
-        }
-        else if (Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.aKey.wasPressedThisFrame)
-        {
-            ChangeLane(-1);
+            if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
+            {
+                ChangeLane(1);
+            }
+            else if (Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.aKey.wasPressedThisFrame)
+            {
+                ChangeLane(-1);
+            }
         }
     }
 
