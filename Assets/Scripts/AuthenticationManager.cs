@@ -11,6 +11,8 @@ using UnityEngine.UI;
 
 public class AuthenticationManager : MonoBehaviour
 {
+    public static AuthenticationManager Instance;
+
     [Header("Panels")]
     public GameObject loginPanel;
     public GameObject registerPanel;
@@ -44,6 +46,18 @@ public class AuthenticationManager : MonoBehaviour
     public static event Action OnGameShown;
     public static event Action OnLoggedIn;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private async void Start()
     {
         await UnityServices.InitializeAsync();
@@ -57,11 +71,12 @@ public class AuthenticationManager : MonoBehaviour
         switchToLoginText.GetComponent<Button>().onClick.AddListener(ShowLoginPanel);
 
         GameManager.Instance.coinsPanel.SetActive(false);
+        GameManager.Instance.menuPanel.SetActive(false);
 
         LoadSavedLoginData();
     }
 
-    private void ShowLoginPanel()
+    public void ShowLoginPanel()
     {
         loginPanel.SetActive(true);
         registerPanel.SetActive(false);
