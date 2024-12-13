@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject coinsPanel;
     public GameObject menuPanel;
+    public GameObject settingsPanel;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
@@ -250,14 +251,28 @@ public class GameManager : MonoBehaviour
         streetLamps.Enqueue(rightLamp);
     }
 
+    public void ShowSettings()
+    {
+        menuPanel.SetActive(false);
+        settingsPanel.SetActive(true);
+    }
+
+    public void HideSettings()
+    {
+        menuPanel.SetActive(true);
+        settingsPanel.SetActive(false);
+    }
+
     private void ShowMenu()
     {
         menuPanel.SetActive(true);
+        coinsPanel.SetActive(false);
     }
 
     private void HideMenu()
     {
         menuPanel.SetActive(false);
+        coinsPanel.SetActive(true);
     }
 
     public void ResumeGame()
