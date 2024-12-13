@@ -108,7 +108,11 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("The 'coins' data could not be found.");
+                Debug.Log("The 'coins' data could not be found. Initializing with default value.");
+
+                coinCount = 0;
+                var defaultData = new Dictionary<string, object> { { "coins", coinCount } };
+                await CloudSaveService.Instance.Data.Player.SaveAsync(defaultData);
             }
         }
         catch (Exception e)
@@ -117,8 +121,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     private void StartSpawning()
     {
+        ResumeGame();
         SpawnCar();
 
         nextSpawnPosition = new Vector3(0, 0, -10);
@@ -245,7 +251,29 @@ public class GameManager : MonoBehaviour
         streetLamps.Enqueue(rightLamp);
     }
 
-    private void Update()
+    private void ShowMenu()
+    {
+        menuPanel.SetActive(true);
+    }
+
+    private void HideMenu()
+    {
+        menuPanel.SetActive(false);
+    }
+
+    public void ResumeGame()
+    {
+        HideMenu();
+        Time.timeScale = 1;
+        AudioManager.Instance.PlayEngineSound();
+    }
+
+    public void PauseGame()
+    {
+        ShowMenu();
+        Time.timeScale = 0;
+        AudioManager.Instance.StopEngineSound();
+    }
     {
         if (Keyboard.current.escapeKey.wasPressedThisFrame)
         {
