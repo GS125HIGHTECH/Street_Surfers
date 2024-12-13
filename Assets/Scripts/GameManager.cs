@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public GameObject carPrefab;
     public GameObject coinPrefab;
     public GameObject streetLampPrefab;
+    public GameObject roadBlockerPrefab;
 
     private GameObject currentCar;
 
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> roadSegments = new();
     private readonly Queue<GameObject> coins = new();
     private readonly Queue<GameObject> streetLamps = new();
+    private readonly Queue<GameObject> roadBlockers = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
