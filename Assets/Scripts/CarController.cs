@@ -163,10 +163,12 @@ public class CarController : MonoBehaviour
 
     private IEnumerator IncreaseSpeedOverTime()
     {
-        while (true)
+        while (currentSpeed < 90f)
         {
             yield return new WaitForSeconds(1f);
             currentSpeed += 0.2f;
         }
+
+        currentSpeed = 90f;
     }
 }
