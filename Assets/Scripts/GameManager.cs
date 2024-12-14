@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public GameObject coinsPanel;
     public GameObject menuPanel;
     public GameObject settingsPanel;
+    public GameObject gameOverPanel;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
@@ -208,6 +209,17 @@ public class GameManager : MonoBehaviour
             {
                 streetLamps.Dequeue();
                 Destroy(oldestLamp);
+            }
+        }
+
+        if (roadBlockers.Count > 0)
+        {
+            GameObject oldestRoadBlocker = roadBlockers.Peek();
+
+            if (oldestRoadBlocker.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                roadBlockers.Dequeue();
+                Destroy(oldestRoadBlocker);
             }
         }
     }
