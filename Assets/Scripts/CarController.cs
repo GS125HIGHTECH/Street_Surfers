@@ -12,7 +12,7 @@ public class CarController : MonoBehaviour
     [SerializeField]
     private float currentSpeed = 2.5f;
 
-    private readonly float wheelRotationSpeed = 90f;
+    private readonly float wheelRotationBaseSpeed = 90f;
     private readonly float laneChangeDuration = 1f;
     private readonly float tiltAngle = 10f;
 
@@ -45,7 +45,9 @@ public class CarController : MonoBehaviour
 
     private void RotateWheels()
     {
-        float rotationAngle = wheelRotationSpeed * Time.deltaTime;
+        float rotationSpeed = wheelRotationBaseSpeed * (currentSpeed / 3.5f);
+        float rotationAngle = rotationSpeed * Time.deltaTime;
+
         if (wheelFL) wheelFL.Rotate(Vector3.right, rotationAngle);
         if (wheelFR) wheelFR.Rotate(Vector3.right, rotationAngle);
         if (wheelRL) wheelRL.Rotate(Vector3.right, rotationAngle);
@@ -163,10 +165,12 @@ public class CarController : MonoBehaviour
 
     private IEnumerator IncreaseSpeedOverTime()
     {
-        while (true)
+        while (currentSpeed < 90f)
         {
             yield return new WaitForSeconds(1f);
             currentSpeed += 0.2f;
         }
+
+        currentSpeed = 90f;
     }
 }
