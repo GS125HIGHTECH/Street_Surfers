@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
@@ -24,8 +25,11 @@ public class GameManager : MonoBehaviour
 
     private GameObject currentCar;
 
+    private CanvasGroup gameOverCanvasGroup;
+
     private readonly float spawnInterval = 0.1f; 
     private readonly float segmentLength = 20f;
+    private readonly float fadeDuration = 1.5f;
 
     private readonly int maxSegmentsAhead = 40;
 
@@ -51,6 +55,20 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        if (gameOverPanel != null)
+        {
+            gameOverCanvasGroup = gameOverPanel.GetComponent<CanvasGroup>();
+            if (gameOverCanvasGroup == null)
+            {
+                gameOverCanvasGroup = gameOverPanel.AddComponent<CanvasGroup>();
+            }
+            gameOverCanvasGroup.alpha = 0f;
+            gameOverPanel.SetActive(false);
         }
     }
 
@@ -240,6 +258,8 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        bool[] isCoinInLine = new bool[linePositions.Length];
+
         foreach (int line in selectedLines)
         {
             for (int i = 0; i < 5; i++)
@@ -250,8 +270,47 @@ public class GameManager : MonoBehaviour
                 coins.Enqueue(coin);
                 coin.AddComponent<Coin>();
             }
+
+            int lineIndex = System.Array.IndexOf(linePositions, line);
+            if (lineIndex != -1)
+            {
+                isCoinInLine[lineIndex] = true;
+            }
+        }
+
+        SpawnRoadBlockers(startPosition, linePositions, isCoinInLine);
+    }
+
+    private void SpawnRoadBlockers(Vector3 startPosition, int[] linePositions, bool[] isCoinInLine)
+    {
+        List<int> availableLines = new();
+
+        for (int i = 0; i < linePositions.Length; i++)
+        {
+            if (!isCoinInLine[i])
+            {
+                availableLines.Add(i);
+            }
+        }
+
+        for (int i = 0; i < availableLines.Count; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, availableLines.Count);
+            (availableLines[i], availableLines[randomIndex]) = (availableLines[randomIndex], availableLines[i]);
+        }
+
+        int blockersToSpawn = Mathf.Min(2, availableLines.Count);
+        for (int i = 0; i < blockersToSpawn; i++)
+        {
+            int lineIndex = availableLines[i];
+            Vector3 blockerPosition = startPosition + new Vector3(linePositions[lineIndex], 0, 0);
+            GameObject roadBlocker = Instantiate(roadBlockerPrefab, blockerPosition, Quaternion.Euler(-90, 0, 0));
+
+            roadBlockers.Enqueue(roadBlocker);
+            roadBlocker.AddComponent<RoadBlocker>();
         }
     }
+
 
     private void SpawnStreetLamps(Vector3 position)
     {
@@ -303,13 +362,14 @@ public class GameManager : MonoBehaviour
         AudioManager.Instance.StopEngineSound();
     }
 
-    public void LogOut()
+    public void RestartGameOver()
     {
-        HideMenu();
-        coinsPanel.SetActive(false);
+        RestartGame();
+        StartSpawning();
+    }
 
-        coinCount = 0;
-
+    private void RestartGame()
+    {
         foreach (var segment in roadSegments)
         {
             Destroy(segment);
@@ -328,6 +388,12 @@ public class GameManager : MonoBehaviour
         }
         streetLamps.Clear();
 
+        foreach (var roadBlocker in roadBlockers)
+        {
+            Destroy(roadBlocker);
+        }
+        roadBlockers.Clear();
+
         if (currentCar != null)
         {
             Destroy(currentCar);
@@ -338,10 +404,48 @@ public class GameManager : MonoBehaviour
         mainCamera.transform.position = nextSpawnPosition;
 
         CancelInvoke(nameof(SpawnRoadSegment));
+
+        gameOverPanel.SetActive(false);
+    }
+
+    public void LogOut()
+    {
+        HideMenu();
+        coinsPanel.SetActive(false);
+
+        coinCount = 0;
+
+        RestartGame();
+
         AudioManager.Instance.StopEngineSound();
 
         AuthenticationService.Instance.SignOut();
 
         AuthenticationManager.Instance.ShowLoginPanel();
+    }
+
+    public void GameOver()
+    {
+        Time.timeScale = 0;
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+            StartCoroutine(FadeIn(gameOverCanvasGroup));
+        }
+
+        coinsPanel.SetActive(false);
+    }
+
+    private IEnumerator FadeIn(CanvasGroup canvasGroup)
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime < fadeDuration)
+        {
+            canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsedTime / fadeDuration);
+            elapsedTime += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        canvasGroup.alpha = 1f;
     }
 }
