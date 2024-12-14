@@ -9,11 +9,13 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip clickSound;
     [SerializeField] private AudioClip tiresSound;
     [SerializeField] private AudioClip engineSound;
+    [SerializeField] private AudioClip carCrashSound;
 
     [SerializeField] private AudioSource clickAudioSource;
     [SerializeField] private AudioSource tiresAudioSource;
     [SerializeField] private AudioSource coinAudioSource;
     [SerializeField] private AudioSource engineAudioSource;
+    [SerializeField] private AudioSource crashAudioSource;
 
     private float lastPlayTime;
     private const float minPlayInterval = 0.1f;
@@ -56,6 +58,14 @@ public class AudioManager : MonoBehaviour
             tiresAudioSource.Play();     
 
             StartCoroutine(FadeOutSound(tiresAudioSource, 1.0f));
+        }
+    }
+
+    public void PlayCarCrashSound()
+    {
+        if (carCrashSound != null && crashAudioSource != null)
+        {
+            crashAudioSource.PlayOneShot(carCrashSound);
         }
     }
 
