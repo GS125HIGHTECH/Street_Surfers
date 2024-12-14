@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
-    private int coinCount = 0;
+    private long coinCount = 0;
     public bool isLoggedIn = false;
 
     private void Awake()
@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Coins: {coinCount}");
     }
 
-    public int GetCoinCount()
+    public long GetCoinCount()
     {
         return coinCount;
     }
