@@ -453,6 +453,7 @@ public class GameManager : MonoBehaviour
             double roundedDistance = Math.Floor(currentDistance * 100) / 100;
 
             await SaveData("bestScore", roundedDistance);
+            LeaderboardManager.Instance.AddScoreToLeaderboard(roundedDistance);
 
             bestScore = roundedDistance;
         }
