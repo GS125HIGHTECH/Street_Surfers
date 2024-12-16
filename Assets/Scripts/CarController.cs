@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 
 public class CarController : MonoBehaviour
 {
+    public static CarController Instance;
+
     public Transform wheelFL;
     public Transform wheelFR;
     public Transform wheelRL;
@@ -11,6 +13,7 @@ public class CarController : MonoBehaviour
 
     [SerializeField]
     private float currentSpeed = 2.5f;
+    private double totalDistance = 0;
 
     private readonly float wheelRotationBaseSpeed = 90f;
     private readonly float laneChangeDuration = 1f;
@@ -21,6 +24,22 @@ public class CarController : MonoBehaviour
     private bool isMobile = false;
     private bool isChangingLane = false;
 
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
+
     private void Start()
     {
         isMobile = Application.isMobilePlatform;
@@ -29,7 +48,11 @@ public class CarController : MonoBehaviour
 
     private void Update()
     {
-        transform.Translate(currentSpeed * Time.deltaTime * Vector3.right);
+        float distancePerFrame = currentSpeed * Time.deltaTime;
+
+        totalDistance += distancePerFrame;
+
+        transform.Translate(distancePerFrame * Vector3.right);
 
         RotateWheels();
 
@@ -172,5 +195,10 @@ public class CarController : MonoBehaviour
         }
 
         currentSpeed = 90f;
+    }
+
+    public double GetTotalDistance()
+    {
+        return totalDistance;
     }
 }

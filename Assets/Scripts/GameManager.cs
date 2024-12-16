@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
-using Unity.Services.Core;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -41,11 +39,11 @@ public class GameManager : MonoBehaviour
     private Camera mainCamera;
 
     private long coinCount = 0;
+    private double bestScore = 0;
     public bool isLoggedIn = false;
 
     private void Awake()
     {
-        Application.targetFrameRate = 60;
         mainCamera = Camera.main;
 
         if (Instance == null)
@@ -76,10 +74,7 @@ public class GameManager : MonoBehaviour
     {
         coinCount++;
 
-        var data = new Dictionary<string, object> { { "coins", coinCount } };
-        await CloudSaveService.Instance.Data.Player.SaveAsync(data);
-
-        Debug.Log($"Coins: {coinCount}");
+        await SaveData("coins", coinCount);
     }
 
     public long GetCoinCount()
@@ -106,6 +101,8 @@ public class GameManager : MonoBehaviour
 
         AudioManager.Instance.PlayEngineSound();
 
+        SettingsManager.Instance.LoadSettings();
+
         try
         {
             await InitializeCloudSave();
@@ -118,35 +115,14 @@ public class GameManager : MonoBehaviour
 
     private async Task InitializeCloudSave()
     {
-        try
-        {
-            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "coins" });
-
-            if (playerData.TryGetValue("coins", out var coinsData))
-            {
-                coinCount = coinsData.Value.GetAs<int>();
-                Debug.Log($"Coins loaded: {coinCount}");
-            }
-            else
-            {
-                Debug.Log("The 'coins' data could not be found. Initializing with default value.");
-
-                coinCount = 0;
-                var defaultData = new Dictionary<string, object> { { "coins", coinCount } };
-                await CloudSaveService.Instance.Data.Player.SaveAsync(defaultData);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error loading cloud save data: {e.Message}");
-        }
+        coinCount = await LoadData("coins", coinCount);
+        bestScore = await LoadData("bestScore", bestScore);
     }
-
 
     private void StartSpawning()
     {
-        ResumeGame();
         SpawnCar();
+        ResumeGame();
 
         nextSpawnPosition = new Vector3(0, 0, -10);
 
@@ -168,6 +144,11 @@ public class GameManager : MonoBehaviour
         if (mainCamera.TryGetComponent<CameraFollow>(out var cameraFollow))
         {
             cameraFollow.target = currentCar.transform;
+        }
+
+        if (currentCar.TryGetComponent<CarController>(out var carController))
+        {
+            CarController.Instance = carController;
         }
     }
 
@@ -271,14 +252,17 @@ public class GameManager : MonoBehaviour
                 coin.AddComponent<Coin>();
             }
 
-            int lineIndex = System.Array.IndexOf(linePositions, line);
+            int lineIndex = Array.IndexOf(linePositions, line);
             if (lineIndex != -1)
             {
                 isCoinInLine[lineIndex] = true;
             }
         }
 
-        SpawnRoadBlockers(startPosition, linePositions, isCoinInLine);
+        if (UnityEngine.Random.value < 0.6f)
+        {
+            SpawnRoadBlockers(startPosition, linePositions, isCoinInLine);
+        }
     }
 
     private void SpawnRoadBlockers(Vector3 startPosition, int[] linePositions, bool[] isCoinInLine)
@@ -403,6 +387,12 @@ public class GameManager : MonoBehaviour
         nextSpawnPosition = Vector3.zero;
         mainCamera.transform.position = nextSpawnPosition;
 
+        if (CarController.Instance != null)
+        {
+            Destroy(CarController.Instance.gameObject);
+            CarController.Instance = null;
+        }
+
         CancelInvoke(nameof(SpawnRoadSegment));
 
         gameOverPanel.SetActive(false);
@@ -414,6 +404,9 @@ public class GameManager : MonoBehaviour
         coinsPanel.SetActive(false);
 
         coinCount = 0;
+        bestScore = 0;
+
+        Application.targetFrameRate = 60;
 
         RestartGame();
 
@@ -424,7 +417,7 @@ public class GameManager : MonoBehaviour
         AuthenticationManager.Instance.ShowLoginPanel();
     }
 
-    public void GameOver()
+    public async void GameOver()
     {
         Time.timeScale = 0;
 
@@ -433,6 +426,8 @@ public class GameManager : MonoBehaviour
             gameOverPanel.SetActive(true);
             StartCoroutine(FadeIn(gameOverCanvasGroup));
         }
+
+        await SaveBestScoreAsync(CarController.Instance.GetTotalDistance());
 
         coinsPanel.SetActive(false);
     }
@@ -447,5 +442,59 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
         canvasGroup.alpha = 1f;
+    }
+
+    private async Task SaveBestScoreAsync(double currentDistance)
+    {
+        double bestScoreData = await LoadData("bestScore", bestScore);
+
+        if (currentDistance > bestScoreData)
+        {
+            double roundedDistance = Math.Floor(currentDistance * 100) / 100;
+
+            await SaveData("bestScore", roundedDistance);
+            LeaderboardManager.Instance.AddScoreToLeaderboard(roundedDistance);
+
+            bestScore = roundedDistance;
+        }
+    }
+
+    private async Task SaveData<T>(string key, T value)
+    {
+        try
+        {
+            var data = new Dictionary<string, object> { { key, value } };
+            await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error saving data for '{key}': {e.Message}");
+        }
+    }
+
+    private async Task<T> LoadData<T>(string key, T defaultValue)
+    {
+        try
+        {
+            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
+
+            if (playerData.TryGetValue(key, out var dataValue))
+            {
+                return dataValue.Value.GetAs<T>();
+            }
+            else
+            {
+                Debug.Log($"The '{key}' data could not be found. Initializing with default value.");
+
+                var defaultData = new Dictionary<string, object> { { key, defaultValue } };
+                await CloudSaveService.Instance.Data.Player.SaveAsync(defaultData);
+                return defaultValue;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error loading cloud save data for key '{key}': {e.Message}");
+            return defaultValue;
+        }
     }
 }

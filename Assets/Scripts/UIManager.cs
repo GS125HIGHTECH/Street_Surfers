@@ -6,11 +6,27 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public TMP_Text coinCountText;
+    public TMP_Text distanceText;
 
     private void Update()
     {
+        UpdateCoinCount();
+        UpdateDistance();
+    }
+
+    private void UpdateCoinCount()
+    {
         long coinCount = GameManager.Instance.GetCoinCount();
         coinCountText.text = FormatNumber(coinCount);
+    }
+
+    private void UpdateDistance()
+    {
+        if (CarController.Instance != null)
+        {
+            long totalDistance = ((long)CarController.Instance.GetTotalDistance());
+            distanceText.text = $"{FormatNumber(totalDistance)} m";
+        }
     }
 
     private string FormatNumber(long number)
@@ -24,8 +40,6 @@ public class UIManager : MonoBehaviour
 
         var cultureInfo = CultureInfo.CurrentCulture;
         string formattedNumber;
-
-        Debug.Log("Current Culture Info: " + cultureInfo.Name);
 
         if (number >= Quintillion)
         {
