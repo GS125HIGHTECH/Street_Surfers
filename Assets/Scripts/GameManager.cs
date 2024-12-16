@@ -169,6 +169,11 @@ public class GameManager : MonoBehaviour
         {
             cameraFollow.target = currentCar.transform;
         }
+
+        if (currentCar.TryGetComponent<CarController>(out var carController))
+        {
+            CarController.Instance = carController;
+        }
     }
 
     private void SpawnRoadSegment()
@@ -402,6 +407,12 @@ public class GameManager : MonoBehaviour
 
         nextSpawnPosition = Vector3.zero;
         mainCamera.transform.position = nextSpawnPosition;
+
+        if (CarController.Instance != null)
+        {
+            Destroy(CarController.Instance.gameObject);
+            CarController.Instance = null;
+        }
 
         CancelInvoke(nameof(SpawnRoadSegment));
 
