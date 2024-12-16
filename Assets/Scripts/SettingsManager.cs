@@ -4,6 +4,8 @@ using Unity.Services.CloudSave;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Threading.Tasks;
+using System;
 
 public class SettingsManager : MonoBehaviour
 {
@@ -45,14 +47,6 @@ public class SettingsManager : MonoBehaviour
 
         fpsValueRect = fpsValueText.GetComponent<RectTransform>();
         volumeValueRect = volumeValueText.GetComponent<RectTransform>();
-
-        fpsLimitSlider.value = fpsLimit;
-        volumeSlider.value = volume;
-
-        LoadSettings();
-
-        Application.targetFrameRate = fpsLimit;
-        AudioListener.volume = volume / 100f;
 
         fpsLimitSlider.onValueChanged.AddListener(OnFpsSliderChanged);
         volumeSlider.onValueChanged.AddListener(OnVolumeSliderChanged);
@@ -121,19 +115,54 @@ public class SettingsManager : MonoBehaviour
         ReturnToMenu();
     }
 
-    public void LoadSettings()
+    public async void LoadSettings()
     {
-        if (PlayerPrefs.HasKey("FpsLimit"))
+        var settingsData = await LoadSettingsFromCloud();
+
+        if (settingsData != null)
         {
-            fpsLimit = PlayerPrefs.GetInt("FpsLimit", DefaultFpsLimit);
-            volume = PlayerPrefs.GetInt("Volume", DefaultVolume);
+            fpsLimit = settingsData["fpsLimit"];
+            volume = settingsData["volume"];
+        }
+        else
+        {
+            if (PlayerPrefs.HasKey("FpsLimit"))
+            {
+                fpsLimit = PlayerPrefs.GetInt("FpsLimit", DefaultFpsLimit);
+                volume = PlayerPrefs.GetInt("Volume", DefaultVolume);
+            }
         }
 
         fpsLimitSlider.value = fpsLimit;
         volumeSlider.value = volume;
 
+        Application.targetFrameRate = fpsLimit;
+        AudioListener.volume = volume / 100f;
+
         fpsValueText.gameObject.SetActive(false);
         volumeValueText.gameObject.SetActive(false);
+    }
+
+    private async Task<Dictionary<string, int>> LoadSettingsFromCloud()
+    {
+        try
+        {
+            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "fpsLimit", "volume" });
+            if (playerData.TryGetValue("fpsLimit", out var fpsValue) && playerData.TryGetValue("volume", out var volumeValue))
+            {
+                return new Dictionary<string, int>
+                {
+                    { "fpsLimit", fpsValue.Value.GetAs<int>() },
+                    { "volume", volumeValue.Value.GetAs<int>() }
+                };
+            }
+            return null;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error loading cloud settings: {e.Message}");
+            return null;
+        }
     }
 
     private void ReturnToMenu()
