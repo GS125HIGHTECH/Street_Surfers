@@ -6,6 +6,7 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public TMP_Text coinCountText;
+    public TMP_Text distanceText;
 
     private void Update()
     {
