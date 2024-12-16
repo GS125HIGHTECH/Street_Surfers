@@ -252,14 +252,17 @@ public class GameManager : MonoBehaviour
                 coin.AddComponent<Coin>();
             }
 
-            int lineIndex = System.Array.IndexOf(linePositions, line);
+            int lineIndex = Array.IndexOf(linePositions, line);
             if (lineIndex != -1)
             {
                 isCoinInLine[lineIndex] = true;
             }
         }
 
-        SpawnRoadBlockers(startPosition, linePositions, isCoinInLine);
+        if (UnityEngine.Random.value < 0.6f)
+        {
+            SpawnRoadBlockers(startPosition, linePositions, isCoinInLine);
+        }
     }
 
     private void SpawnRoadBlockers(Vector3 startPosition, int[] linePositions, bool[] isCoinInLine)
