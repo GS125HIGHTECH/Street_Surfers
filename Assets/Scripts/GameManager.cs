@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
-using Unity.Services.Core;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -103,6 +101,8 @@ public class GameManager : MonoBehaviour
 
         AudioManager.Instance.PlayEngineSound();
 
+        SettingsManager.Instance.LoadSettings();
+
         try
         {
             await InitializeCloudSave();
@@ -117,7 +117,7 @@ public class GameManager : MonoBehaviour
     {
         coinCount = await LoadData("coins", coinCount);
         bestScore = await LoadData("bestScore", bestScore);
-            }
+    }
 
     private void StartSpawning()
     {
@@ -402,6 +402,8 @@ public class GameManager : MonoBehaviour
 
         coinCount = 0;
         bestScore = 0;
+
+        Application.targetFrameRate = 60;
 
         RestartGame();
 
