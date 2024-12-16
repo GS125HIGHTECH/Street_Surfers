@@ -1,11 +1,10 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
 using Unity.Services.CloudSave;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System.Threading.Tasks;
-using System;
 
 public class SettingsManager : MonoBehaviour
 {
