@@ -121,8 +121,8 @@ public class GameManager : MonoBehaviour
 
     private void StartSpawning()
     {
-        ResumeGame();
         SpawnCar();
+        ResumeGame();
 
         nextSpawnPosition = new Vector3(0, 0, -10);
 
