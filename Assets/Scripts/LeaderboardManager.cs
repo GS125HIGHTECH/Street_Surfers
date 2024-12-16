@@ -1,11 +1,8 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Unity.Services.CloudSave;
-using UnityEngine;
 using Unity.Services.Leaderboards;
-using UnityEditor.Rendering;
-using Newtonsoft.Json;
+using UnityEngine;
 
 public class LeaderboardManager : MonoBehaviour
 {
@@ -31,12 +28,10 @@ public class LeaderboardManager : MonoBehaviour
         try
         {
             string username = AuthenticationManager.Instance.GetUsername();
-            Debug.Log(username);
 
             var metadata = new Dictionary<string, string>() { { "username", username } };
 
             await LeaderboardsService.Instance.AddPlayerScoreAsync(LeaderboardId, score, new AddPlayerScoreOptions { Metadata = metadata });
-            Debug.Log($"Successfully added score {score} to leaderboard.");
             FetchLeaderboardScores();
         }
         catch (Exception e)
