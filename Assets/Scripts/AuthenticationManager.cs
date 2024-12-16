@@ -173,6 +173,7 @@ public class AuthenticationManager : MonoBehaviour
                 SaveLoginData(username, password);
             }
 
+            SaveUsername(username);
             ShowGame();
         }
         catch (Exception e)
@@ -239,6 +240,7 @@ public class AuthenticationManager : MonoBehaviour
                 SaveLoginData(username, password);
             }
 
+            SaveUsername(username);
             ShowGame();
         }
         catch (Exception e)
@@ -254,6 +256,11 @@ public class AuthenticationManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    private void SaveUsername(string username)
+    {
+        PlayerPrefs.SetString("username", username);
+    }
+
     private void LoadSavedLoginData()
     {
         if (PlayerPrefs.HasKey("savedUsername") && PlayerPrefs.HasKey("savedPassword"))
@@ -263,6 +270,18 @@ public class AuthenticationManager : MonoBehaviour
 
             loginUsernameInput.text = savedUsername;
             loginPasswordInput.text = savedPassword;
+        }
+    }
+
+    public string GetUsername()
+    {
+        if (PlayerPrefs.HasKey("username"))
+        {
+            return PlayerPrefs.GetString("username");
+        }
+        else
+        {
+            return "Guest";
         }
     }
 
