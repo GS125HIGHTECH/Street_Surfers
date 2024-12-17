@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Services.Leaderboards;
 using UnityEngine;
 
@@ -9,6 +10,10 @@ public class LeaderboardManager : MonoBehaviour
     public static LeaderboardManager Instance { get; private set; }
 
     private const string LeaderboardId = "best_scores";
+
+    [Header("UI Elements")]
+    public Transform content;
+    public GameObject entryPrefab;
 
     private void Awake()
     {
@@ -44,6 +49,11 @@ public class LeaderboardManager : MonoBehaviour
     {
         try
         {
+            foreach (Transform child in content)
+            {
+                Destroy(child.gameObject);
+            }
+
             var scoresResponse = await LeaderboardsService.Instance.GetScoresAsync(LeaderboardId, new GetScoresOptions { IncludeMetadata = true });
 
             foreach (var scoreEntry in scoresResponse.Results)
@@ -68,13 +78,42 @@ public class LeaderboardManager : MonoBehaviour
                         Debug.LogError($"Error parsing metadata: {jsonException.Message}");
                     }
                 }
-
-                Debug.Log($"Rank: {scoreEntry.Rank}, Player: {username}, Score: {score}");
+                CreateLeaderboardEntry(scoreEntry.Rank + 1, username, score);
             }
         }
         catch (Exception e)
         {
             Debug.LogError($"Error retrieving leaderboard scores: {e.Message}");
         }
+    }
+
+    private void CreateLeaderboardEntry(int rank, string username, double score)
+    {
+        GameObject entryObject = Instantiate(entryPrefab, content);
+
+        if (entryObject.TryGetComponent<TextMeshProUGUI>(out var textField))
+        {
+            textField.text = $"{rank}. {username} - {score:F2}";
+        }
+        else
+        {
+            Debug.LogError("TextMeshPro component not found in entryPrefab!");
+        }
+    }
+
+    public void ShowLeaderboard()
+    {
+        if(!GameManager.Instance.leaderboardPanel.activeSelf)
+        {
+            GameManager.Instance.touchScreenText.SetActive(false);
+            FetchLeaderboardScores();
+            GameManager.Instance.leaderboardPanel.SetActive(true);
+        }
+    }
+
+    public void HideLeaderboard()
+    {
+        GameManager.Instance.leaderboardPanel.SetActive(false);
+        GameManager.Instance.touchScreenText.SetActive(true);
     }
 }
