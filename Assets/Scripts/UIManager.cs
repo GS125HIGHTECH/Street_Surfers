@@ -72,4 +72,9 @@ public class UIManager : MonoBehaviour
 
         return formattedNumber;
     }
+
+    public void OpenLink(string link)
+    {
+        Application.OpenURL(link);
+    }
 }

@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
     public GameObject menuPanel;
     public GameObject settingsPanel;
     public GameObject gameOverPanel;
+    public GameObject startPanel;
+    public GameObject creditsPanel;
+    public GameObject leaderboardPanel;
+    public GameObject touchScreenText;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
@@ -41,6 +45,7 @@ public class GameManager : MonoBehaviour
     private long coinCount = 0;
     private double bestScore = 0;
     public bool isLoggedIn = false;
+    private bool isGamePlayable = false;
 
     private void Awake()
     {
@@ -99,8 +104,6 @@ public class GameManager : MonoBehaviour
     {
         isLoggedIn = true;
 
-        AudioManager.Instance.PlayEngineSound();
-
         SettingsManager.Instance.LoadSettings();
 
         try
@@ -121,17 +124,28 @@ public class GameManager : MonoBehaviour
 
     private void StartSpawning()
     {
-        SpawnCar();
-        ResumeGame();
+        Time.timeScale = 1;
+        menuPanel.SetActive(false);
+        startPanel.SetActive(true);
+        coinsPanel.SetActive(false);
 
-        nextSpawnPosition = new Vector3(0, 0, -10);
-
-        for (int i = 0; i < maxSegmentsAhead; i++)
+        if(isGamePlayable)
         {
-            SpawnRoadSegment();
-        }
+            startPanel.SetActive(false);
+            coinsPanel.SetActive(true);
+            AudioManager.Instance.PlayEngineSound();
+            SpawnCar();
+            ResumeGame();
 
-        InvokeRepeating(nameof(SpawnRoadSegment), 0f, spawnInterval);
+            nextSpawnPosition = new Vector3(0, 0, -10);
+
+            for (int i = 0; i < maxSegmentsAhead; i++)
+            {
+                SpawnRoadSegment();
+            }
+
+            InvokeRepeating(nameof(SpawnRoadSegment), 0f, spawnInterval);
+        }
     }
 
     private void SpawnCar()
@@ -320,6 +334,18 @@ public class GameManager : MonoBehaviour
         settingsPanel.SetActive(false);
     }
 
+    public void ShowCredits()
+    {
+        menuPanel.SetActive(false);
+        creditsPanel.SetActive(true);
+    }
+
+    public void HideCredits()
+    {
+        menuPanel.SetActive(true);
+        creditsPanel.SetActive(false);
+    }
+
     private void ShowMenu()
     {
         menuPanel.SetActive(true);
@@ -337,6 +363,12 @@ public class GameManager : MonoBehaviour
         HideMenu();
         Time.timeScale = 1;
         AudioManager.Instance.PlayEngineSound();
+    }
+
+    public void StartGame()
+    {
+        isGamePlayable = true;
+        StartSpawning();
     }
 
     public void PauseGame()
@@ -386,6 +418,7 @@ public class GameManager : MonoBehaviour
 
         nextSpawnPosition = Vector3.zero;
         mainCamera.transform.position = nextSpawnPosition;
+        isGamePlayable = false; 
 
         if (CarController.Instance != null)
         {

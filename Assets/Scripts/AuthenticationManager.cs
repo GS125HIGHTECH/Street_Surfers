@@ -73,6 +73,9 @@ public class AuthenticationManager : MonoBehaviour
         GameManager.Instance.menuPanel.SetActive(false);
         GameManager.Instance.settingsPanel.SetActive(false);
         GameManager.Instance.gameOverPanel.SetActive(false);
+        GameManager.Instance.startPanel.SetActive(false);
+        GameManager.Instance.creditsPanel.SetActive(false);
+        GameManager.Instance.leaderboardPanel.SetActive(false);
 
         LoadSavedLoginData();
     }
@@ -105,7 +108,6 @@ public class AuthenticationManager : MonoBehaviour
 
         OnGameShown?.Invoke();
         OnLoggedIn?.Invoke();
-        GameManager.Instance.coinsPanel.SetActive(true);
     }
 
     private void HighlightInputField(TMP_InputField inputField, Color color)
