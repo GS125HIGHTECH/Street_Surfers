@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
     public GameObject menuPanel;
     public GameObject settingsPanel;
     public GameObject gameOverPanel;
+    public GameObject startPanel;
+    public GameObject creditsPanel;
+    public GameObject leaderboardPanel;
+    public GameObject touchScreenText;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
