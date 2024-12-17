@@ -105,6 +105,7 @@ public class LeaderboardManager : MonoBehaviour
     {
         if(!GameManager.Instance.leaderboardPanel.activeSelf)
         {
+            AudioManager.Instance.PlayClickSound();
             GameManager.Instance.touchScreenText.SetActive(false);
             FetchLeaderboardScores();
             GameManager.Instance.leaderboardPanel.SetActive(true);
