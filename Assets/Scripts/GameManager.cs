@@ -324,6 +324,18 @@ public class GameManager : MonoBehaviour
         settingsPanel.SetActive(false);
     }
 
+    public void ShowCredits()
+    {
+        menuPanel.SetActive(false);
+        creditsPanel.SetActive(true);
+    }
+
+    public void HideCredits()
+    {
+        menuPanel.SetActive(true);
+        creditsPanel.SetActive(false);
+    }
+
     private void ShowMenu()
     {
         menuPanel.SetActive(true);
