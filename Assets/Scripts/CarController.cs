@@ -16,7 +16,10 @@ public class CarController : MonoBehaviour
     private double totalDistance = 0;
 
     private readonly float wheelRotationBaseSpeed = 90f;
-    private readonly float laneChangeDuration = 1f;
+
+    private float boostDuration = 2f;
+    private float laneChangeDuration = 1f;
+
     private readonly float tiltAngle = 10f;
 
     private readonly float[] lanes = { -8f, 0f, 8f };
@@ -195,6 +198,24 @@ public class CarController : MonoBehaviour
         }
 
         currentSpeed = 90f;
+    }
+
+    public void UpdateHandling(float newHandling)
+    {
+        laneChangeDuration = Mathf.Clamp(newHandling, 0.1f, 1f);
+    }
+
+    public void UpdateBoostDuration(float newDuration)
+    {
+        boostDuration = newDuration;
+    }
+
+    private IEnumerator ApplySpeedBoost()
+    {
+        float originalSpeed = currentSpeed;
+        currentSpeed += 5f;
+        yield return new WaitForSeconds(boostDuration);
+        currentSpeed = originalSpeed;
     }
 
     public double GetTotalDistance()
