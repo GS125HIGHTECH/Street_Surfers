@@ -5,13 +5,31 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance;
+
     public TMP_Text coinCountText;
     public TMP_Text distanceText;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private void Update()
     {
-        UpdateCoinCount();
-        UpdateDistance();
+        if (GameManager.Instance.isLoggedIn)
+        {
+            UpdateCoinCount();
+            UpdateDistance();
+        }
     }
 
     private void UpdateCoinCount()
@@ -29,7 +47,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private string FormatNumber(long number)
+    public string FormatNumber(long number)
     {
         const long Quintillion = 1_000_000_000_000_000_000;
         const long Quadrillion = 1_000_000_000_000_000;
