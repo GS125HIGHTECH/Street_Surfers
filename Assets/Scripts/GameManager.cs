@@ -544,7 +544,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private async Task SaveData<T>(string key, T value)
+    public async Task SaveData<T>(string key, T value)
     {
         try
         {
@@ -557,7 +557,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private async Task<T> LoadData<T>(string key, T defaultValue)
+    public async Task<T> LoadData<T>(string key, T defaultValue)
     {
         try
         {
