@@ -76,6 +76,8 @@ public class AuthenticationManager : MonoBehaviour
         GameManager.Instance.startPanel.SetActive(false);
         GameManager.Instance.creditsPanel.SetActive(false);
         GameManager.Instance.leaderboardPanel.SetActive(false);
+        GameManager.Instance.profilePanel.SetActive(false);
+        GameManager.Instance.upgradePanel.SetActive(false);
 
         LoadSavedLoginData();
     }
