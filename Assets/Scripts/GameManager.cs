@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     public GameObject coinPrefab;
     public GameObject streetLampPrefab;
     public GameObject roadBlockerPrefab;
+    public GameObject mandatoryCarriagewayPrefab;
 
     private GameObject currentCar;
 
