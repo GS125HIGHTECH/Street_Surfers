@@ -462,6 +462,12 @@ public class GameManager : MonoBehaviour
         }
         roadBlockers.Clear();
 
+        foreach (var mandatoryCarriageway in mandatoryCarriageways)
+        {
+            Destroy(mandatoryCarriageway);
+        }
+        mandatoryCarriageways.Clear();
+
         if (currentCar != null)
         {
             Destroy(currentCar);
