@@ -6517,6 +6517,7 @@ MonoBehaviour:
   coinPrefab: {fileID: 3787433472940531717, guid: 40235fafe7d13b043aae4a4aa9afcd9a, type: 3}
   streetLampPrefab: {fileID: 4340829902474375263, guid: 805fe8520ca8daf4f9855ded306a0ca1, type: 3}
   roadBlockerPrefab: {fileID: 100000, guid: 6148a4dd2f4929045a6bc3673a29ec30, type: 3}
+  mandatoryCarriagewayPrefab: {fileID: 5502359255524751318, guid: 29bee7047918bf845bd83dee6ada4991, type: 3}
   isLoggedIn: 0
 --- !u!1 &746120349
 GameObject:
