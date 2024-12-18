@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> coins = new();
     private readonly Queue<GameObject> streetLamps = new();
     private readonly Queue<GameObject> roadBlockers = new();
+    private readonly Queue<GameObject> mandatoryCarriageways = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
@@ -236,6 +237,17 @@ public class GameManager : MonoBehaviour
                 Destroy(oldestRoadBlocker);
             }
         }
+
+        if (mandatoryCarriageways.Count > 0)
+        {
+            GameObject oldestmandatoryDirectionArrow45Down = mandatoryCarriageways.Peek();
+
+            if (oldestmandatoryDirectionArrow45Down.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                mandatoryCarriageways.Dequeue();
+                Destroy(oldestmandatoryDirectionArrow45Down);
+            }
+        }
     }
 
     private void SpawnCoins(Vector3 startPosition)
@@ -299,15 +311,65 @@ public class GameManager : MonoBehaviour
         }
 
         int blockersToSpawn = Mathf.Min(2, availableLines.Count);
+        List<int> spawnedBlockerIndices = new();
+
         for (int i = 0; i < blockersToSpawn; i++)
         {
             int lineIndex = availableLines[i];
+            spawnedBlockerIndices.Add(lineIndex);
+
             Vector3 blockerPosition = startPosition + new Vector3(linePositions[lineIndex], 0, 0);
             GameObject roadBlocker = Instantiate(roadBlockerPrefab, blockerPosition, Quaternion.Euler(-90, 0, 0));
 
             roadBlockers.Enqueue(roadBlocker);
             roadBlocker.AddComponent<RoadBlocker>();
         }
+
+        if (IsSpawnedInRightmostLines(spawnedBlockerIndices, linePositions.Length))
+        {
+            SpawnMandatoryArrow(startPosition, linePositions[linePositions.Length - 2], true);
+        }
+        else if (IsSpawnedInLeftmostLines(spawnedBlockerIndices))
+        {
+            SpawnMandatoryArrow(startPosition, linePositions[1], false);
+        }
+
+        //if (spawnedBlockerIndices.Contains(linePositions.Length - 1) && spawnedBlockerIndices.Contains(linePositions.Length - 2))
+        //{
+        //    Vector3 arrowPosition = startPosition + new Vector3(linePositions[linePositions.Length - 2], 0, 2);
+        //    GameObject mandatoryDirectionArrow45Down = Instantiate(mandatoryDirectionArrow45DownPrefab, arrowPosition, Quaternion.Euler(0, 90, 0));
+        //    mandatoryDirectionArrows45Down.Enqueue(mandatoryDirectionArrow45Down);
+        //}
+        //else if (spawnedBlockerIndices.Contains(1) && spawnedBlockerIndices.Contains(0))
+        //{
+        //    Vector3 arrowPosition = startPosition + new Vector3(linePositions[1], 0, 2);
+        //    GameObject mandatoryDirectionArrow45Down = Instantiate(mandatoryDirectionArrow45DownPrefab, arrowPosition, Quaternion.Euler(0, 90, 0));
+        //    mandatoryDirectionArrows45Down.Enqueue(mandatoryDirectionArrow45Down);
+        //}
+    }
+
+    private bool IsSpawnedInRightmostLines(List<int> indices, int lineCount)
+    {
+        return indices.Contains(lineCount - 1) && indices.Contains(lineCount - 2);
+    }
+
+    private bool IsSpawnedInLeftmostLines(List<int> indices)
+    {
+        return indices.Contains(1) && indices.Contains(0);
+    }
+
+    private void SpawnMandatoryArrow(Vector3 startPosition, float lineOffset, bool isRight)
+    {
+        Vector3 arrowPosition = startPosition + new Vector3(lineOffset, 0, 2);
+        GameObject mandatoryCarriageway = Instantiate(mandatoryCarriagewayPrefab, arrowPosition, Quaternion.Euler(0, 90, 0));
+
+        Transform roadSignLeft = mandatoryCarriageway.transform.Find("road sign_left");
+        if (roadSignLeft != null)
+        {
+            roadSignLeft.localRotation = Quaternion.Euler(isRight ? 0 : -90, 0, 0);
+        }
+
+        mandatoryCarriageways.Enqueue(mandatoryCarriageway);
     }
 
 
