@@ -109,6 +109,8 @@ public class LeaderboardManager : MonoBehaviour
             GameManager.Instance.touchScreenText.SetActive(false);
             FetchLeaderboardScores();
             GameManager.Instance.leaderboardPanel.SetActive(true);
+            GameManager.Instance.profilePanel.SetActive(false);
+            GameManager.Instance.upgradePanel.SetActive(false);
         }
     }
 
