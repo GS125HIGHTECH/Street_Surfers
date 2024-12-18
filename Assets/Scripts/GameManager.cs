@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     public GameObject creditsPanel;
     public GameObject leaderboardPanel;
     public GameObject touchScreenText;
+    public GameObject profilePanel;
+    public GameObject upgradePanel;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
@@ -333,19 +335,6 @@ public class GameManager : MonoBehaviour
         {
             SpawnMandatoryArrow(startPosition, linePositions[1], false);
         }
-
-        //if (spawnedBlockerIndices.Contains(linePositions.Length - 1) && spawnedBlockerIndices.Contains(linePositions.Length - 2))
-        //{
-        //    Vector3 arrowPosition = startPosition + new Vector3(linePositions[linePositions.Length - 2], 0, 2);
-        //    GameObject mandatoryDirectionArrow45Down = Instantiate(mandatoryDirectionArrow45DownPrefab, arrowPosition, Quaternion.Euler(0, 90, 0));
-        //    mandatoryDirectionArrows45Down.Enqueue(mandatoryDirectionArrow45Down);
-        //}
-        //else if (spawnedBlockerIndices.Contains(1) && spawnedBlockerIndices.Contains(0))
-        //{
-        //    Vector3 arrowPosition = startPosition + new Vector3(linePositions[1], 0, 2);
-        //    GameObject mandatoryDirectionArrow45Down = Instantiate(mandatoryDirectionArrow45DownPrefab, arrowPosition, Quaternion.Euler(0, 90, 0));
-        //    mandatoryDirectionArrows45Down.Enqueue(mandatoryDirectionArrow45Down);
-        //}
     }
 
     private bool IsSpawnedInRightmostLines(List<int> indices, int lineCount)
