@@ -86,6 +86,12 @@ public class GameManager : MonoBehaviour
         await SaveData("coins", coinCount);
     }
 
+    public async Task<long> GetCoinCountAsync()
+    {
+        coinCount = await LoadData("coins", coinCount);
+        return coinCount;
+    }
+
     public long GetCoinCount()
     {
         return coinCount;
@@ -126,19 +132,27 @@ public class GameManager : MonoBehaviour
         bestScore = await LoadData("bestScore", bestScore);
     }
 
-    private void StartSpawning()
+    private async void StartSpawning()
     {
         Time.timeScale = 1;
         menuPanel.SetActive(false);
         startPanel.SetActive(true);
         coinsPanel.SetActive(false);
+        if(!isGamePlayable)
+        {
+            SpawnCar();
+        }
+        await UpgradeManager.Instance.LoadUpgradeData();
+        CarController.Instance.PauseController();
 
-        if(isGamePlayable)
+        if (isGamePlayable)
         {
             startPanel.SetActive(false);
             coinsPanel.SetActive(true);
             AudioManager.Instance.PlayEngineSound();
-            SpawnCar();
+            AttachCameraToCar();
+            CarController.Instance.ResumeController();
+
             ResumeGame();
 
             nextSpawnPosition = new Vector3(0, 0, -10);
@@ -159,14 +173,17 @@ public class GameManager : MonoBehaviour
 
         currentCar = Instantiate(carPrefab, carStartPosition, carRotation);
 
-        if (mainCamera.TryGetComponent<CameraFollow>(out var cameraFollow))
-        {
-            cameraFollow.target = currentCar.transform;
-        }
-
         if (currentCar.TryGetComponent<CarController>(out var carController))
         {
             CarController.Instance = carController;
+        }
+    }
+
+    private void AttachCameraToCar()
+    {
+        if (mainCamera.TryGetComponent<CameraFollow>(out var cameraFollow))
+        {
+            cameraFollow.target = currentCar.transform;
         }
     }
 
