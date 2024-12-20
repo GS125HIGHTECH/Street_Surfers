@@ -26,6 +26,8 @@ public class CarController : MonoBehaviour
     private int currentLaneIndex = 1;
     private bool isMobile = false;
     private bool isChangingLane = false;
+    private bool isGamePlayable = false;
+    private Coroutine speedCoroutine;
 
 
     private void Awake()
@@ -46,11 +48,13 @@ public class CarController : MonoBehaviour
     private void Start()
     {
         isMobile = Application.isMobilePlatform;
-        StartCoroutine(IncreaseSpeedOverTime());
     }
 
     private void Update()
     {
+        if (!isGamePlayable)
+            return;
+
         float distancePerFrame = currentSpeed * Time.deltaTime;
 
         totalDistance += distancePerFrame;
@@ -191,13 +195,11 @@ public class CarController : MonoBehaviour
 
     private IEnumerator IncreaseSpeedOverTime()
     {
-        while (currentSpeed < 90f)
+        while (isGamePlayable)
         {
             yield return new WaitForSeconds(1f);
-            currentSpeed += 0.2f;
+            currentSpeed = Mathf.Clamp(currentSpeed + 0.2f, 0f, 90f);
         }
-
-        currentSpeed = 90f;
     }
 
     public void UpdateHandling(float newHandling)
@@ -221,5 +223,21 @@ public class CarController : MonoBehaviour
     public double GetTotalDistance()
     {
         return totalDistance;
+    }
+
+    public void ResumeController()
+    {
+        isGamePlayable = true;
+        speedCoroutine = StartCoroutine(IncreaseSpeedOverTime());
+    }
+
+    public void PauseController()
+    {
+        isGamePlayable = false;
+        if (speedCoroutine != null)
+        {
+            StopCoroutine(speedCoroutine);
+            speedCoroutine = null;
+        }
     }
 }
