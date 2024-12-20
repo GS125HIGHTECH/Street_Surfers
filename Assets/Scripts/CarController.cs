@@ -17,7 +17,9 @@ public class CarController : MonoBehaviour
 
     private readonly float wheelRotationBaseSpeed = 90f;
 
+    [SerializeField]
     private float boostDuration = 2f;
+    [SerializeField]
     private float laneChangeDuration = 1f;
 
     private readonly float tiltAngle = 10f;
