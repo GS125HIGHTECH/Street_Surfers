@@ -9179,8 +9179,6 @@ MonoBehaviour:
   handlingUpgradeEntryButton: {fileID: 1600186004}
   boostUpgradeEntryButton: {fileID: 2115344787}
   coinCountText: {fileID: 228566230}
-  handlingLevel: 0
-  boostDurationLevel: 0
 --- !u!114 &1042650429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13977,7 +13975,7 @@ GameObject:
   - component: {fileID: 1497350559}
   - component: {fileID: 1497350558}
   m_Layer: 5
-  m_Name: SpeedUpgradeEntry (1)
+  m_Name: SpeedUpgradeEntry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
