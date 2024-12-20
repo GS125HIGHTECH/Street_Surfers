@@ -124,6 +124,11 @@ public class CarController : MonoBehaviour
                 ChangeLane(-1);
             }
         }
+
+        //if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        //{
+        //    StartCoroutine(ApplySpeedBoost());
+        //}
     }
 
     private void ChangeLane(int direction)
@@ -218,6 +223,9 @@ public class CarController : MonoBehaviour
     {
         float originalSpeed = currentSpeed;
         currentSpeed += 5f;
+
+        BoostManager.Instance.StartBoostEffect(boostDuration);
+
         yield return new WaitForSeconds(boostDuration);
         currentSpeed = originalSpeed;
     }
