@@ -18,12 +18,15 @@ public class GameManager : MonoBehaviour
     public GameObject creditsPanel;
     public GameObject leaderboardPanel;
     public GameObject touchScreenText;
+    public GameObject profilePanel;
+    public GameObject upgradePanel;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
     public GameObject coinPrefab;
     public GameObject streetLampPrefab;
     public GameObject roadBlockerPrefab;
+    public GameObject mandatoryCarriagewayPrefab;
 
     private GameObject currentCar;
 
@@ -39,6 +42,7 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> coins = new();
     private readonly Queue<GameObject> streetLamps = new();
     private readonly Queue<GameObject> roadBlockers = new();
+    private readonly Queue<GameObject> mandatoryCarriageways = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
@@ -82,6 +86,12 @@ public class GameManager : MonoBehaviour
         await SaveData("coins", coinCount);
     }
 
+    public async Task<long> GetCoinCountAsync()
+    {
+        coinCount = await LoadData("coins", coinCount);
+        return coinCount;
+    }
+
     public long GetCoinCount()
     {
         return coinCount;
@@ -122,19 +132,27 @@ public class GameManager : MonoBehaviour
         bestScore = await LoadData("bestScore", bestScore);
     }
 
-    private void StartSpawning()
+    private async void StartSpawning()
     {
         Time.timeScale = 1;
         menuPanel.SetActive(false);
         startPanel.SetActive(true);
         coinsPanel.SetActive(false);
+        if(!isGamePlayable)
+        {
+            SpawnCar();
+        }
+        await UpgradeManager.Instance.LoadUpgradeData();
+        CarController.Instance.PauseController();
 
-        if(isGamePlayable)
+        if (isGamePlayable)
         {
             startPanel.SetActive(false);
             coinsPanel.SetActive(true);
             AudioManager.Instance.PlayEngineSound();
-            SpawnCar();
+            AttachCameraToCar();
+            CarController.Instance.ResumeController();
+
             ResumeGame();
 
             nextSpawnPosition = new Vector3(0, 0, -10);
@@ -155,14 +173,17 @@ public class GameManager : MonoBehaviour
 
         currentCar = Instantiate(carPrefab, carStartPosition, carRotation);
 
-        if (mainCamera.TryGetComponent<CameraFollow>(out var cameraFollow))
-        {
-            cameraFollow.target = currentCar.transform;
-        }
-
         if (currentCar.TryGetComponent<CarController>(out var carController))
         {
             CarController.Instance = carController;
+        }
+    }
+
+    private void AttachCameraToCar()
+    {
+        if (mainCamera.TryGetComponent<CameraFollow>(out var cameraFollow))
+        {
+            cameraFollow.target = currentCar.transform;
         }
     }
 
@@ -235,6 +256,17 @@ public class GameManager : MonoBehaviour
                 Destroy(oldestRoadBlocker);
             }
         }
+
+        if (mandatoryCarriageways.Count > 0)
+        {
+            GameObject oldestmandatoryDirectionArrow45Down = mandatoryCarriageways.Peek();
+
+            if (oldestmandatoryDirectionArrow45Down.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                mandatoryCarriageways.Dequeue();
+                Destroy(oldestmandatoryDirectionArrow45Down);
+            }
+        }
     }
 
     private void SpawnCoins(Vector3 startPosition)
@@ -298,15 +330,52 @@ public class GameManager : MonoBehaviour
         }
 
         int blockersToSpawn = Mathf.Min(2, availableLines.Count);
+        List<int> spawnedBlockerIndices = new();
+
         for (int i = 0; i < blockersToSpawn; i++)
         {
             int lineIndex = availableLines[i];
+            spawnedBlockerIndices.Add(lineIndex);
+
             Vector3 blockerPosition = startPosition + new Vector3(linePositions[lineIndex], 0, 0);
             GameObject roadBlocker = Instantiate(roadBlockerPrefab, blockerPosition, Quaternion.Euler(-90, 0, 0));
 
             roadBlockers.Enqueue(roadBlocker);
             roadBlocker.AddComponent<RoadBlocker>();
         }
+
+        if (IsSpawnedInRightmostLines(spawnedBlockerIndices, linePositions.Length))
+        {
+            SpawnMandatoryArrow(startPosition, linePositions[linePositions.Length - 2], true);
+        }
+        else if (IsSpawnedInLeftmostLines(spawnedBlockerIndices))
+        {
+            SpawnMandatoryArrow(startPosition, linePositions[1], false);
+        }
+    }
+
+    private bool IsSpawnedInRightmostLines(List<int> indices, int lineCount)
+    {
+        return indices.Contains(lineCount - 1) && indices.Contains(lineCount - 2);
+    }
+
+    private bool IsSpawnedInLeftmostLines(List<int> indices)
+    {
+        return indices.Contains(1) && indices.Contains(0);
+    }
+
+    private void SpawnMandatoryArrow(Vector3 startPosition, float lineOffset, bool isRight)
+    {
+        Vector3 arrowPosition = startPosition + new Vector3(lineOffset, 0, 2);
+        GameObject mandatoryCarriageway = Instantiate(mandatoryCarriagewayPrefab, arrowPosition, Quaternion.Euler(0, 90, 0));
+
+        Transform roadSignLeft = mandatoryCarriageway.transform.Find("road sign_left");
+        if (roadSignLeft != null)
+        {
+            roadSignLeft.localRotation = Quaternion.Euler(isRight ? 0 : -90, 0, 0);
+        }
+
+        mandatoryCarriageways.Enqueue(mandatoryCarriageway);
     }
 
 
@@ -410,6 +479,12 @@ public class GameManager : MonoBehaviour
         }
         roadBlockers.Clear();
 
+        foreach (var mandatoryCarriageway in mandatoryCarriageways)
+        {
+            Destroy(mandatoryCarriageway);
+        }
+        mandatoryCarriageways.Clear();
+
         if (currentCar != null)
         {
             Destroy(currentCar);
@@ -492,7 +567,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private async Task SaveData<T>(string key, T value)
+    public async Task SaveData<T>(string key, T value)
     {
         try
         {
@@ -505,7 +580,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private async Task<T> LoadData<T>(string key, T defaultValue)
+    public async Task<T> LoadData<T>(string key, T defaultValue)
     {
         try
         {

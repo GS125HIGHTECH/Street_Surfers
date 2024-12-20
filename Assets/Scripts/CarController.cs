@@ -16,13 +16,20 @@ public class CarController : MonoBehaviour
     private double totalDistance = 0;
 
     private readonly float wheelRotationBaseSpeed = 90f;
-    private readonly float laneChangeDuration = 1f;
+
+    [SerializeField]
+    private float boostDuration = 2f;
+    [SerializeField]
+    private float laneChangeDuration = 1f;
+
     private readonly float tiltAngle = 10f;
 
     private readonly float[] lanes = { -8f, 0f, 8f };
     private int currentLaneIndex = 1;
     private bool isMobile = false;
     private bool isChangingLane = false;
+    private bool isGamePlayable = false;
+    private Coroutine speedCoroutine;
 
 
     private void Awake()
@@ -43,11 +50,13 @@ public class CarController : MonoBehaviour
     private void Start()
     {
         isMobile = Application.isMobilePlatform;
-        StartCoroutine(IncreaseSpeedOverTime());
     }
 
     private void Update()
     {
+        if (!isGamePlayable)
+            return;
+
         float distancePerFrame = currentSpeed * Time.deltaTime;
 
         totalDistance += distancePerFrame;
@@ -115,6 +124,11 @@ public class CarController : MonoBehaviour
                 ChangeLane(-1);
             }
         }
+
+        //if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        //{
+        //    StartCoroutine(ApplySpeedBoost());
+        //}
     }
 
     private void ChangeLane(int direction)
@@ -188,17 +202,52 @@ public class CarController : MonoBehaviour
 
     private IEnumerator IncreaseSpeedOverTime()
     {
-        while (currentSpeed < 90f)
+        while (isGamePlayable)
         {
             yield return new WaitForSeconds(1f);
-            currentSpeed += 0.2f;
+            currentSpeed = Mathf.Clamp(currentSpeed + 0.2f, 0f, 90f);
         }
+    }
 
-        currentSpeed = 90f;
+    public void UpdateHandling(float newHandling)
+    {
+        laneChangeDuration = Mathf.Clamp(newHandling, 0.1f, 1f);
+    }
+
+    public void UpdateBoostDuration(float newDuration)
+    {
+        boostDuration = newDuration;
+    }
+
+    private IEnumerator ApplySpeedBoost()
+    {
+        float originalSpeed = currentSpeed;
+        currentSpeed += 5f;
+
+        BoostManager.Instance.StartBoostEffect(boostDuration);
+
+        yield return new WaitForSeconds(boostDuration);
+        currentSpeed = originalSpeed;
     }
 
     public double GetTotalDistance()
     {
         return totalDistance;
+    }
+
+    public void ResumeController()
+    {
+        isGamePlayable = true;
+        speedCoroutine = StartCoroutine(IncreaseSpeedOverTime());
+    }
+
+    public void PauseController()
+    {
+        isGamePlayable = false;
+        if (speedCoroutine != null)
+        {
+            StopCoroutine(speedCoroutine);
+            speedCoroutine = null;
+        }
     }
 }
