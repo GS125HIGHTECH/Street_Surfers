@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
@@ -74,6 +73,11 @@ public class AuthenticationManager : MonoBehaviour
         GameManager.Instance.menuPanel.SetActive(false);
         GameManager.Instance.settingsPanel.SetActive(false);
         GameManager.Instance.gameOverPanel.SetActive(false);
+        GameManager.Instance.startPanel.SetActive(false);
+        GameManager.Instance.creditsPanel.SetActive(false);
+        GameManager.Instance.leaderboardPanel.SetActive(false);
+        GameManager.Instance.profilePanel.SetActive(false);
+        GameManager.Instance.upgradePanel.SetActive(false);
 
         LoadSavedLoginData();
     }
@@ -106,7 +110,6 @@ public class AuthenticationManager : MonoBehaviour
 
         OnGameShown?.Invoke();
         OnLoggedIn?.Invoke();
-        GameManager.Instance.coinsPanel.SetActive(true);
     }
 
     private void HighlightInputField(TMP_InputField inputField, Color color)
@@ -173,6 +176,7 @@ public class AuthenticationManager : MonoBehaviour
                 SaveLoginData(username, password);
             }
 
+            SaveUsername(username);
             ShowGame();
         }
         catch (Exception e)
@@ -239,6 +243,7 @@ public class AuthenticationManager : MonoBehaviour
                 SaveLoginData(username, password);
             }
 
+            SaveUsername(username);
             ShowGame();
         }
         catch (Exception e)
@@ -254,6 +259,11 @@ public class AuthenticationManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    private void SaveUsername(string username)
+    {
+        PlayerPrefs.SetString("username", username);
+    }
+
     private void LoadSavedLoginData()
     {
         if (PlayerPrefs.HasKey("savedUsername") && PlayerPrefs.HasKey("savedPassword"))
@@ -263,6 +273,18 @@ public class AuthenticationManager : MonoBehaviour
 
             loginUsernameInput.text = savedUsername;
             loginPasswordInput.text = savedPassword;
+        }
+    }
+
+    public string GetUsername()
+    {
+        if (PlayerPrefs.HasKey("username"))
+        {
+            return PlayerPrefs.GetString("username");
+        }
+        else
+        {
+            return "Guest";
         }
     }
 

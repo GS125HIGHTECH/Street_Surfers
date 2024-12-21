@@ -5,15 +5,49 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance;
+
     public TMP_Text coinCountText;
+    public TMP_Text distanceText;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Update()
+    {
+        if (GameManager.Instance.isLoggedIn)
+        {
+            UpdateCoinCount();
+            UpdateDistance();
+        }
+    }
+
+    private void UpdateCoinCount()
     {
         long coinCount = GameManager.Instance.GetCoinCount();
         coinCountText.text = FormatNumber(coinCount);
     }
 
-    private string FormatNumber(long number)
+    private void UpdateDistance()
+    {
+        if (CarController.Instance != null)
+        {
+            long totalDistance = ((long)CarController.Instance.GetTotalDistance());
+            distanceText.text = $"{FormatNumber(totalDistance)} m";
+        }
+    }
+
+    public string FormatNumber(long number)
     {
         const long Quintillion = 1_000_000_000_000_000_000;
         const long Quadrillion = 1_000_000_000_000_000;
@@ -24,8 +58,6 @@ public class UIManager : MonoBehaviour
 
         var cultureInfo = CultureInfo.CurrentCulture;
         string formattedNumber;
-
-        Debug.Log("Current Culture Info: " + cultureInfo.Name);
 
         if (number >= Quintillion)
         {
@@ -57,5 +89,10 @@ public class UIManager : MonoBehaviour
         }
 
         return formattedNumber;
+    }
+
+    public void OpenLink(string link)
+    {
+        Application.OpenURL(link);
     }
 }

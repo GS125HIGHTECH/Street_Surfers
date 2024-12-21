@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
-using Unity.Services.Core;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,36 +14,48 @@ public class GameManager : MonoBehaviour
     public GameObject menuPanel;
     public GameObject settingsPanel;
     public GameObject gameOverPanel;
+    public GameObject startPanel;
+    public GameObject creditsPanel;
+    public GameObject leaderboardPanel;
+    public GameObject touchScreenText;
+    public GameObject profilePanel;
+    public GameObject upgradePanel;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
     public GameObject coinPrefab;
     public GameObject streetLampPrefab;
     public GameObject roadBlockerPrefab;
+    public GameObject mandatoryCarriagewayPrefab;
+    public GameObject speedBoostPrefab;
 
     private GameObject currentCar;
 
     private CanvasGroup gameOverCanvasGroup;
 
-    private readonly float spawnInterval = 0.1f; 
+    private readonly float spawnInterval = 0.2f; 
     private readonly float segmentLength = 20f;
     private readonly float fadeDuration = 1.5f;
-
+    private const float MinDistanceForBoost = 300f;
+    private double lastBoostSpawnDistance = 0;
     private readonly int maxSegmentsAhead = 40;
 
     private readonly Queue<GameObject> roadSegments = new();
     private readonly Queue<GameObject> coins = new();
     private readonly Queue<GameObject> streetLamps = new();
     private readonly Queue<GameObject> roadBlockers = new();
+    private readonly Queue<GameObject> mandatoryCarriageways = new();
+    private readonly Queue<GameObject> speedBoosts = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
     private long coinCount = 0;
+    private double bestScore = 0;
     public bool isLoggedIn = false;
+    private bool isGamePlayable = false;
 
     private void Awake()
     {
-        Application.targetFrameRate = 60;
         mainCamera = Camera.main;
 
         if (Instance == null)
@@ -76,10 +86,13 @@ public class GameManager : MonoBehaviour
     {
         coinCount++;
 
-        var data = new Dictionary<string, object> { { "coins", coinCount } };
-        await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+        await SaveData("coins", coinCount);
+    }
 
-        Debug.Log($"Coins: {coinCount}");
+    public async Task<long> GetCoinCountAsync()
+    {
+        coinCount = await LoadData("coins", coinCount);
+        return coinCount;
     }
 
     public long GetCoinCount()
@@ -104,7 +117,7 @@ public class GameManager : MonoBehaviour
     {
         isLoggedIn = true;
 
-        AudioManager.Instance.PlayEngineSound();
+        SettingsManager.Instance.LoadSettings();
 
         try
         {
@@ -118,44 +131,42 @@ public class GameManager : MonoBehaviour
 
     private async Task InitializeCloudSave()
     {
-        try
-        {
-            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "coins" });
-
-            if (playerData.TryGetValue("coins", out var coinsData))
-            {
-                coinCount = coinsData.Value.GetAs<int>();
-                Debug.Log($"Coins loaded: {coinCount}");
-            }
-            else
-            {
-                Debug.Log("The 'coins' data could not be found. Initializing with default value.");
-
-                coinCount = 0;
-                var defaultData = new Dictionary<string, object> { { "coins", coinCount } };
-                await CloudSaveService.Instance.Data.Player.SaveAsync(defaultData);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error loading cloud save data: {e.Message}");
-        }
+        coinCount = await LoadData("coins", coinCount);
+        bestScore = await LoadData("bestScore", bestScore);
     }
 
-
-    private void StartSpawning()
+    private async void StartSpawning()
     {
-        ResumeGame();
-        SpawnCar();
-
-        nextSpawnPosition = new Vector3(0, 0, -10);
-
-        for (int i = 0; i < maxSegmentsAhead; i++)
+        Time.timeScale = 1;
+        menuPanel.SetActive(false);
+        startPanel.SetActive(true);
+        coinsPanel.SetActive(false);
+        if(!isGamePlayable)
         {
-            SpawnRoadSegment();
+            SpawnCar();
         }
+        await UpgradeManager.Instance.LoadUpgradeData();
+        CarController.Instance.PauseController();
 
-        InvokeRepeating(nameof(SpawnRoadSegment), 0f, spawnInterval);
+        if (isGamePlayable)
+        {
+            startPanel.SetActive(false);
+            coinsPanel.SetActive(true);
+            AudioManager.Instance.PlayEngineSound();
+            AttachCameraToCar();
+            CarController.Instance.ResumeController();
+
+            ResumeGame();
+
+            nextSpawnPosition = new Vector3(0, 0, -10);
+
+            for (int i = 0; i < maxSegmentsAhead; i++)
+            {
+                SpawnRoadSegment();
+            }
+
+            InvokeRepeating(nameof(SpawnRoadSegment), 0f, spawnInterval);
+        }
     }
 
     private void SpawnCar()
@@ -165,6 +176,14 @@ public class GameManager : MonoBehaviour
 
         currentCar = Instantiate(carPrefab, carStartPosition, carRotation);
 
+        if (currentCar.TryGetComponent<CarController>(out var carController))
+        {
+            CarController.Instance = carController;
+        }
+    }
+
+    private void AttachCameraToCar()
+    {
         if (mainCamera.TryGetComponent<CameraFollow>(out var cameraFollow))
         {
             cameraFollow.target = currentCar.transform;
@@ -240,6 +259,32 @@ public class GameManager : MonoBehaviour
                 Destroy(oldestRoadBlocker);
             }
         }
+
+        if (mandatoryCarriageways.Count > 0)
+        {
+            GameObject oldestmandatoryDirectionArrow45Down = mandatoryCarriageways.Peek();
+
+            if (oldestmandatoryDirectionArrow45Down.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                mandatoryCarriageways.Dequeue();
+                Destroy(oldestmandatoryDirectionArrow45Down);
+            }
+        }
+
+        if (speedBoosts.Count > 0)
+        {
+            GameObject oldestSpeedBoost = speedBoosts.Peek();
+
+            if (oldestSpeedBoost == null || oldestSpeedBoost.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                speedBoosts.Dequeue();
+
+                if (oldestSpeedBoost != null)
+                {
+                    Destroy(oldestSpeedBoost);
+                }
+            }
+        }
     }
 
     private void SpawnCoins(Vector3 startPosition)
@@ -271,14 +316,17 @@ public class GameManager : MonoBehaviour
                 coin.AddComponent<Coin>();
             }
 
-            int lineIndex = System.Array.IndexOf(linePositions, line);
+            int lineIndex = Array.IndexOf(linePositions, line);
             if (lineIndex != -1)
             {
                 isCoinInLine[lineIndex] = true;
             }
         }
 
-        SpawnRoadBlockers(startPosition, linePositions, isCoinInLine);
+        if (UnityEngine.Random.value < 0.6f)
+        {
+            SpawnRoadBlockers(startPosition, linePositions, isCoinInLine);
+        }
     }
 
     private void SpawnRoadBlockers(Vector3 startPosition, int[] linePositions, bool[] isCoinInLine)
@@ -300,15 +348,66 @@ public class GameManager : MonoBehaviour
         }
 
         int blockersToSpawn = Mathf.Min(2, availableLines.Count);
+        List<int> spawnedBlockerIndices = new();
+
         for (int i = 0; i < blockersToSpawn; i++)
         {
             int lineIndex = availableLines[i];
+            spawnedBlockerIndices.Add(lineIndex);
+
             Vector3 blockerPosition = startPosition + new Vector3(linePositions[lineIndex], 0, 0);
             GameObject roadBlocker = Instantiate(roadBlockerPrefab, blockerPosition, Quaternion.Euler(-90, 0, 0));
 
             roadBlockers.Enqueue(roadBlocker);
             roadBlocker.AddComponent<RoadBlocker>();
         }
+
+        double totalDistance = CarController.Instance.GetTotalDistance();
+        double distanceSinceLastBoost = totalDistance - lastBoostSpawnDistance;
+
+        int remainingSpaces = availableLines.Count - blockersToSpawn;
+
+        if (remainingSpaces == 1 && distanceSinceLastBoost >= MinDistanceForBoost)
+        {
+            Vector3 speedBoostPosition = startPosition + new Vector3(linePositions[availableLines[availableLines.Count - 1]], 1.8f, 0);
+            GameObject speedBoost = Instantiate(speedBoostPrefab, speedBoostPosition, Quaternion.identity);
+            speedBoosts.Enqueue(speedBoost);
+
+            lastBoostSpawnDistance = totalDistance;
+        }
+
+        if (IsSpawnedInRightmostLines(spawnedBlockerIndices, linePositions.Length))
+        {
+            SpawnMandatoryArrow(startPosition, linePositions[linePositions.Length - 2], true);
+        }
+        else if (IsSpawnedInLeftmostLines(spawnedBlockerIndices))
+        {
+            SpawnMandatoryArrow(startPosition, linePositions[1], false);
+        }
+    }
+
+    private bool IsSpawnedInRightmostLines(List<int> indices, int lineCount)
+    {
+        return indices.Contains(lineCount - 1) && indices.Contains(lineCount - 2);
+    }
+
+    private bool IsSpawnedInLeftmostLines(List<int> indices)
+    {
+        return indices.Contains(1) && indices.Contains(0);
+    }
+
+    private void SpawnMandatoryArrow(Vector3 startPosition, float lineOffset, bool isRight)
+    {
+        Vector3 arrowPosition = startPosition + new Vector3(lineOffset, 0, 2);
+        GameObject mandatoryCarriageway = Instantiate(mandatoryCarriagewayPrefab, arrowPosition, Quaternion.Euler(0, 90, 0));
+
+        Transform roadSignLeft = mandatoryCarriageway.transform.Find("road sign_left");
+        if (roadSignLeft != null)
+        {
+            roadSignLeft.localRotation = Quaternion.Euler(isRight ? 0 : -90, 0, 0);
+        }
+
+        mandatoryCarriageways.Enqueue(mandatoryCarriageway);
     }
 
 
@@ -336,6 +435,18 @@ public class GameManager : MonoBehaviour
         settingsPanel.SetActive(false);
     }
 
+    public void ShowCredits()
+    {
+        menuPanel.SetActive(false);
+        creditsPanel.SetActive(true);
+    }
+
+    public void HideCredits()
+    {
+        menuPanel.SetActive(true);
+        creditsPanel.SetActive(false);
+    }
+
     private void ShowMenu()
     {
         menuPanel.SetActive(true);
@@ -353,6 +464,12 @@ public class GameManager : MonoBehaviour
         HideMenu();
         Time.timeScale = 1;
         AudioManager.Instance.PlayEngineSound();
+    }
+
+    public void StartGame()
+    {
+        isGamePlayable = true;
+        StartSpawning();
     }
 
     public void PauseGame()
@@ -394,6 +511,18 @@ public class GameManager : MonoBehaviour
         }
         roadBlockers.Clear();
 
+        foreach (var mandatoryCarriageway in mandatoryCarriageways)
+        {
+            Destroy(mandatoryCarriageway);
+        }
+        mandatoryCarriageways.Clear();
+
+        foreach (var speedBoost in speedBoosts)
+        {
+            Destroy(speedBoost);
+        }
+        speedBoosts.Clear();
+
         if (currentCar != null)
         {
             Destroy(currentCar);
@@ -402,6 +531,13 @@ public class GameManager : MonoBehaviour
 
         nextSpawnPosition = Vector3.zero;
         mainCamera.transform.position = nextSpawnPosition;
+        isGamePlayable = false; 
+
+        if (CarController.Instance != null)
+        {
+            Destroy(CarController.Instance.gameObject);
+            CarController.Instance = null;
+        }
 
         CancelInvoke(nameof(SpawnRoadSegment));
 
@@ -414,6 +550,9 @@ public class GameManager : MonoBehaviour
         coinsPanel.SetActive(false);
 
         coinCount = 0;
+        bestScore = 0;
+
+        Application.targetFrameRate = 60;
 
         RestartGame();
 
@@ -424,7 +563,7 @@ public class GameManager : MonoBehaviour
         AuthenticationManager.Instance.ShowLoginPanel();
     }
 
-    public void GameOver()
+    public async void GameOver()
     {
         Time.timeScale = 0;
 
@@ -433,6 +572,8 @@ public class GameManager : MonoBehaviour
             gameOverPanel.SetActive(true);
             StartCoroutine(FadeIn(gameOverCanvasGroup));
         }
+
+        await SaveBestScoreAsync(CarController.Instance.GetTotalDistance());
 
         coinsPanel.SetActive(false);
     }
@@ -447,5 +588,59 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
         canvasGroup.alpha = 1f;
+    }
+
+    private async Task SaveBestScoreAsync(double currentDistance)
+    {
+        double bestScoreData = await LoadData("bestScore", bestScore);
+
+        if (currentDistance > bestScoreData)
+        {
+            double roundedDistance = Math.Floor(currentDistance * 100) / 100;
+
+            await SaveData("bestScore", roundedDistance);
+            LeaderboardManager.Instance.AddScoreToLeaderboard(roundedDistance);
+
+            bestScore = roundedDistance;
+        }
+    }
+
+    public async Task SaveData<T>(string key, T value)
+    {
+        try
+        {
+            var data = new Dictionary<string, object> { { key, value } };
+            await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error saving data for '{key}': {e.Message}");
+        }
+    }
+
+    public async Task<T> LoadData<T>(string key, T defaultValue)
+    {
+        try
+        {
+            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
+
+            if (playerData.TryGetValue(key, out var dataValue))
+            {
+                return dataValue.Value.GetAs<T>();
+            }
+            else
+            {
+                Debug.Log($"The '{key}' data could not be found. Initializing with default value.");
+
+                var defaultData = new Dictionary<string, object> { { key, defaultValue } };
+                await CloudSaveService.Instance.Data.Player.SaveAsync(defaultData);
+                return defaultValue;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error loading cloud save data for key '{key}': {e.Message}");
+            return defaultValue;
+        }
     }
 }

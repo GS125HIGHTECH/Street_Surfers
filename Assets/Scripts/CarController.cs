@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 
 public class CarController : MonoBehaviour
 {
+    public static CarController Instance;
+
     public Transform wheelFL;
     public Transform wheelFR;
     public Transform wheelRL;
@@ -11,25 +13,57 @@ public class CarController : MonoBehaviour
 
     [SerializeField]
     private float currentSpeed = 2.5f;
+    private double totalDistance = 0;
 
     private readonly float wheelRotationBaseSpeed = 90f;
-    private readonly float laneChangeDuration = 1f;
+
+    [SerializeField]
+    private float boostDuration = 2f;
+    [SerializeField]
+    private float laneChangeDuration = 1f;
+
     private readonly float tiltAngle = 10f;
 
     private readonly float[] lanes = { -8f, 0f, 8f };
     private int currentLaneIndex = 1;
     private bool isMobile = false;
     private bool isChangingLane = false;
+    private bool isGamePlayable = false;
+    private Coroutine speedCoroutine;
+    [SerializeField]
+    private bool isBoostActive = false;
+
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
 
     private void Start()
     {
         isMobile = Application.isMobilePlatform;
-        StartCoroutine(IncreaseSpeedOverTime());
     }
 
     private void Update()
     {
-        transform.Translate(currentSpeed * Time.deltaTime * Vector3.right);
+        if (!isGamePlayable)
+            return;
+
+        float distancePerFrame = currentSpeed * Time.deltaTime;
+
+        totalDistance += distancePerFrame;
+
+        transform.Translate(distancePerFrame * Vector3.right);
 
         RotateWheels();
 
@@ -92,6 +126,11 @@ public class CarController : MonoBehaviour
                 ChangeLane(-1);
             }
         }
+
+        //if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        //{
+        //    StartCoroutine(ApplySpeedBoost());
+        //}
     }
 
     private void ChangeLane(int direction)
@@ -165,12 +204,59 @@ public class CarController : MonoBehaviour
 
     private IEnumerator IncreaseSpeedOverTime()
     {
-        while (currentSpeed < 90f)
+        while (isGamePlayable)
         {
             yield return new WaitForSeconds(1f);
-            currentSpeed += 0.2f;
+            currentSpeed = Mathf.Clamp(currentSpeed + 0.2f, 0f, 90f);
         }
+    }
 
-        currentSpeed = 90f;
+    public void UpdateHandling(float newHandling)
+    {
+        laneChangeDuration = Mathf.Clamp(newHandling, 0.1f, 1f);
+    }
+
+    public void UpdateBoostDuration(float newDuration)
+    {
+        boostDuration = newDuration;
+    }
+
+    public void StartSpeedBoost()
+    {
+        if (isBoostActive) return;
+
+        currentSpeed += 8f;
+        isBoostActive = true;
+
+        BoostManager.Instance.StartBoostEffect(boostDuration);
+
+        Invoke(nameof(EndSpeedBoost), boostDuration);
+    }
+
+    private void EndSpeedBoost()
+    {
+        currentSpeed -= 8f;
+        isBoostActive = false;
+    }
+
+    public double GetTotalDistance()
+    {
+        return totalDistance;
+    }
+
+    public void ResumeController()
+    {
+        isGamePlayable = true;
+        speedCoroutine = StartCoroutine(IncreaseSpeedOverTime());
+    }
+
+    public void PauseController()
+    {
+        isGamePlayable = false;
+        if (speedCoroutine != null)
+        {
+            StopCoroutine(speedCoroutine);
+            speedCoroutine = null;
+        }
     }
 }
