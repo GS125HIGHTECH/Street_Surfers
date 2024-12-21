@@ -9282,7 +9282,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boostImage: {fileID: 503710656}
-  boostBorder: {fileID: 0}
 --- !u!1 &1052142417
 GameObject:
   m_ObjectHideFlags: 0
