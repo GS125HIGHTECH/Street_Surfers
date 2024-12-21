@@ -219,7 +219,7 @@ public class CarController : MonoBehaviour
         boostDuration = newDuration;
     }
 
-    private IEnumerator ApplySpeedBoost()
+    public IEnumerator ApplySpeedBoost()
     {
         float originalSpeed = currentSpeed;
         currentSpeed += 5f;
