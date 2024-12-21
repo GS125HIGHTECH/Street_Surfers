@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     public GameObject streetLampPrefab;
     public GameObject roadBlockerPrefab;
     public GameObject mandatoryCarriagewayPrefab;
+    public GameObject speedBoostPrefab;
 
     private GameObject currentCar;
 
@@ -43,6 +44,7 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> streetLamps = new();
     private readonly Queue<GameObject> roadBlockers = new();
     private readonly Queue<GameObject> mandatoryCarriageways = new();
+    private readonly Queue<GameObject> speedBoosts = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
 
@@ -265,6 +267,17 @@ public class GameManager : MonoBehaviour
             {
                 mandatoryCarriageways.Dequeue();
                 Destroy(oldestmandatoryDirectionArrow45Down);
+            }
+        }
+
+        if (speedBoosts.Count > 0)
+        {
+            GameObject oldestSpeedBoost = speedBoosts.Peek();
+
+            if (oldestSpeedBoost.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                speedBoosts.Dequeue();
+                Destroy(oldestSpeedBoost);
             }
         }
     }
