@@ -7,16 +7,10 @@ public class SpeedBoost : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            StartCoroutine(TriggerSpeedBoost());
-
+            Destroy(gameObject);
             AudioManager.Instance.PlaySpeedBoostSound();
+
+            CarController.Instance.StartSpeedBoost();
         }
-    }
-
-    private IEnumerator TriggerSpeedBoost()
-    {
-        yield return StartCoroutine(CarController.Instance.ApplySpeedBoost());
-
-        Destroy(gameObject);
     }
 }
