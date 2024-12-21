@@ -33,10 +33,11 @@ public class GameManager : MonoBehaviour
 
     private CanvasGroup gameOverCanvasGroup;
 
-    private readonly float spawnInterval = 0.1f; 
+    private readonly float spawnInterval = 0.2f; 
     private readonly float segmentLength = 20f;
     private readonly float fadeDuration = 1.5f;
-
+    private const float MinDistanceForBoost = 300f;
+    private double lastBoostSpawnDistance = 0;
     private readonly int maxSegmentsAhead = 40;
 
     private readonly Queue<GameObject> roadSegments = new();
@@ -274,10 +275,14 @@ public class GameManager : MonoBehaviour
         {
             GameObject oldestSpeedBoost = speedBoosts.Peek();
 
-            if (oldestSpeedBoost.transform.position.z < mainCamera.transform.position.z - 10)
+            if (oldestSpeedBoost == null || oldestSpeedBoost.transform.position.z < mainCamera.transform.position.z - 10)
             {
                 speedBoosts.Dequeue();
-                Destroy(oldestSpeedBoost);
+
+                if (oldestSpeedBoost != null)
+                {
+                    Destroy(oldestSpeedBoost);
+                }
             }
         }
     }
@@ -355,6 +360,20 @@ public class GameManager : MonoBehaviour
 
             roadBlockers.Enqueue(roadBlocker);
             roadBlocker.AddComponent<RoadBlocker>();
+        }
+
+        double totalDistance = CarController.Instance.GetTotalDistance();
+        double distanceSinceLastBoost = totalDistance - lastBoostSpawnDistance;
+
+        int remainingSpaces = availableLines.Count - blockersToSpawn;
+
+        if (remainingSpaces == 1 && distanceSinceLastBoost >= MinDistanceForBoost)
+        {
+            Vector3 speedBoostPosition = startPosition + new Vector3(linePositions[availableLines[availableLines.Count - 1]], 1.8f, 0);
+            GameObject speedBoost = Instantiate(speedBoostPrefab, speedBoostPosition, Quaternion.identity);
+            speedBoosts.Enqueue(speedBoost);
+
+            lastBoostSpawnDistance = totalDistance;
         }
 
         if (IsSpawnedInRightmostLines(spawnedBlockerIndices, linePositions.Length))
@@ -497,6 +516,12 @@ public class GameManager : MonoBehaviour
             Destroy(mandatoryCarriageway);
         }
         mandatoryCarriageways.Clear();
+
+        foreach (var speedBoost in speedBoosts)
+        {
+            Destroy(speedBoost);
+        }
+        speedBoosts.Clear();
 
         if (currentCar != null)
         {
