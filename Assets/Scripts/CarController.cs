@@ -30,6 +30,8 @@ public class CarController : MonoBehaviour
     private bool isChangingLane = false;
     private bool isGamePlayable = false;
     private Coroutine speedCoroutine;
+    [SerializeField]
+    private bool isBoostActive = false;
 
 
     private void Awake()
@@ -219,15 +221,22 @@ public class CarController : MonoBehaviour
         boostDuration = newDuration;
     }
 
-    private IEnumerator ApplySpeedBoost()
+    public void StartSpeedBoost()
     {
-        float originalSpeed = currentSpeed;
-        currentSpeed += 5f;
+        if (isBoostActive) return;
+
+        currentSpeed += 8f;
+        isBoostActive = true;
 
         BoostManager.Instance.StartBoostEffect(boostDuration);
 
-        yield return new WaitForSeconds(boostDuration);
-        currentSpeed = originalSpeed;
+        Invoke(nameof(EndSpeedBoost), boostDuration);
+    }
+
+    private void EndSpeedBoost()
+    {
+        currentSpeed -= 8f;
+        isBoostActive = false;
     }
 
     public double GetTotalDistance()

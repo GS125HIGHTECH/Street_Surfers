@@ -2661,7 +2661,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Mouse Click Sound Effect by <color="blue">freesound_community</color>
+  m_text: 'Mouse Click and Car Acceleration Sound Effect by <color="blue">freesound_community</color>
 
 '
   m_isRightToLeft: 0
@@ -7483,6 +7483,7 @@ MonoBehaviour:
   streetLampPrefab: {fileID: 4340829902474375263, guid: 805fe8520ca8daf4f9855ded306a0ca1, type: 3}
   roadBlockerPrefab: {fileID: 100000, guid: 6148a4dd2f4929045a6bc3673a29ec30, type: 3}
   mandatoryCarriagewayPrefab: {fileID: 5502359255524751318, guid: 29bee7047918bf845bd83dee6ada4991, type: 3}
+  speedBoostPrefab: {fileID: 4771864004028276163, guid: 2d7dd281b34b62a489324f9f74d4892d, type: 3}
   isLoggedIn: 0
 --- !u!1 &746120349
 GameObject:
@@ -9282,7 +9283,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boostImage: {fileID: 503710656}
-  boostBorder: {fileID: 0}
 --- !u!1 &1052142417
 GameObject:
   m_ObjectHideFlags: 0
@@ -10833,6 +10833,7 @@ GameObject:
   - component: {fileID: 1210749073}
   - component: {fileID: 1210749075}
   - component: {fileID: 1210749076}
+  - component: {fileID: 1210749077}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -10857,11 +10858,13 @@ MonoBehaviour:
   tiresSound: {fileID: 8300000, guid: 0bebac8c258f5bd4b9066d640bbb8449, type: 3}
   engineSound: {fileID: 8300000, guid: 316224186e8ae6543990a05f4dc13981, type: 3}
   carCrashSound: {fileID: 8300000, guid: 61ad195ee0adbcf43a81943f1745cb23, type: 3}
+  speedBoostSound: {fileID: 8300000, guid: feecd51ad3f8be744a320d6aa4fbdef7, type: 3}
   clickAudioSource: {fileID: 1210749072}
   tiresAudioSource: {fileID: 1210749074}
   coinAudioSource: {fileID: 1210749073}
   engineAudioSource: {fileID: 1210749075}
   crashAudioSource: {fileID: 1210749076}
+  speedBoostAudioSource: {fileID: 1210749077}
 --- !u!4 &1210749071
 Transform:
   m_ObjectHideFlags: 0
@@ -11266,6 +11269,103 @@ AudioSource:
     m_PostInfinity: 2
     m_RotationOrder: 4
 --- !u!82 &1210749076
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210749069}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!82 &1210749077
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
