@@ -19,7 +19,107 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 474252328960
-    m_Localized: Street Surfers 2
+    m_Localized: Street Surfers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3490338586624
+    m_Localized: "Nazwa u\u017Cytkownika..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3634819776512
+    m_Localized: "Has\u0142o..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4890091077632
+    m_Localized: "Powt\xF3rz has\u0142o..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5395253051392
+    m_Localized: Zarejestruj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5380690427904
+    m_Localized: Zaloguj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6063036579840
+    m_Localized: "Dotknij aby rozpocz\u0105\u0107..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6928048865280
+    m_Localized: "Zapami\u0119taj mnie"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8707037741056
+    m_Localized: "Masz ju\u017C konto?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8752441081856
+    m_Localized: Nie masz konta?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10214898417664
+    m_Localized: Profil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10904945311744
+    m_Localized: Ranking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11020343197696
+    m_Localized: Ulepsz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12000807895040
+    m_Localized: 'Koszt:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22630818398208
+    m_Localized: Zagraj ponownie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185267527106560
+    m_Localized: "Wzn\xF3w"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185377715666944
+    m_Localized: Ustawienia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185473576484864
+    m_Localized: Wyloguj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185598839373824
+    m_Localized: "Podzi\u0119kowania"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187089461460992
+    m_Localized: "G\u0142o\u015Bno\u015B\u0107:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187191303356416
+    m_Localized: 'Limit FPS:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187570124505088
+    m_Localized: Zapisz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 189275532705792
+    m_Localized: Koniec gry!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190240377815040
+    m_Localized: Ulepszenie prowadzenia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190235474673664
+    m_Localized: Ulepszenie czasu trwania
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190824006828032
+    m_Localized: MAX POZIOM
     m_Metadata:
       m_Items: []
   references:
