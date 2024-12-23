@@ -22,6 +22,106 @@ MonoBehaviour:
     m_Localized: Street Surfers
     m_Metadata:
       m_Items: []
+  - m_Id: 3490338586624
+    m_Localized: Username...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3634819776512
+    m_Localized: Password...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4890091077632
+    m_Localized: Repeat Password...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5380690427904
+    m_Localized: Login
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5395253051392
+    m_Localized: Register
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6063036579840
+    m_Localized: Touch to start...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6928048865280
+    m_Localized: Remember me
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8707037741056
+    m_Localized: Already have an account?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8752441081856
+    m_Localized: Don't have an account?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10214898417664
+    m_Localized: Profile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10904945311744
+    m_Localized: Leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11020343197696
+    m_Localized: Upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12000807895040
+    m_Localized: 'Cost:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22630818398208
+    m_Localized: Play again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185267527106560
+    m_Localized: Resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185377715666944
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185473576484864
+    m_Localized: Sign out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185598839373824
+    m_Localized: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187089461460992
+    m_Localized: 'Volume:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187191303356416
+    m_Localized: 'FPS limit:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187570124505088
+    m_Localized: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 189275532705792
+    m_Localized: Game Over!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190235474673664
+    m_Localized: Boost Duration Upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190240377815040
+    m_Localized: Handling Upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190824006828032
+    m_Localized: MAX LEVEL
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

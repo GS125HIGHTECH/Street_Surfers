@@ -19,6 +19,106 @@ MonoBehaviour:
     m_Key: title
     m_Metadata:
       m_Items: []
+  - m_Id: 3490338586624
+    m_Key: username
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3634819776512
+    m_Key: password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4890091077632
+    m_Key: repeatPassword
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5380690427904
+    m_Key: login
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5395253051392
+    m_Key: register
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6063036579840
+    m_Key: touchToStart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6928048865280
+    m_Key: rememberMe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8707037741056
+    m_Key: alreadyHaveAccount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8752441081856
+    m_Key: dontHaveAccount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10214898417664
+    m_Key: profile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10904945311744
+    m_Key: leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11020343197696
+    m_Key: upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12000807895040
+    m_Key: cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22630818398208
+    m_Key: restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185267527106560
+    m_Key: resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185377715666944
+    m_Key: settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185473576484864
+    m_Key: signOut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185598839373824
+    m_Key: credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187089461460992
+    m_Key: volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187191303356416
+    m_Key: fpsLimit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187570124505088
+    m_Key: save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 189275532705792
+    m_Key: gameOver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190235474673664
+    m_Key: boostDurationUpgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190240377815040
+    m_Key: handlingUpgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190824006828032
+    m_Key: maxLevel
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
