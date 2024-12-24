@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using TMPro;
 using Unity.Services.CloudSave;
 using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 public class SettingsManager : MonoBehaviour
@@ -12,6 +14,8 @@ public class SettingsManager : MonoBehaviour
 
     public Slider fpsLimitSlider;
     public Slider volumeSlider;
+    public TMP_Dropdown graphicsQualityDropdown;
+
     public Button saveButton;
     public Button returnButton;
 
@@ -20,9 +24,11 @@ public class SettingsManager : MonoBehaviour
 
     private const int DefaultFpsLimit = 60;
     private const int DefaultVolume = 100;
+    private const int DefaultGraphicsQuality = 0;
 
     private int fpsLimit = DefaultFpsLimit;
     private int volume = DefaultVolume;
+    private int graphicsQuality = DefaultGraphicsQuality;
 
     private RectTransform fpsValueRect;
     private RectTransform volumeValueRect;
@@ -52,6 +58,18 @@ public class SettingsManager : MonoBehaviour
 
         saveButton.onClick.AddListener(SaveSettings);
         returnButton.onClick.AddListener(ReturnToMenu);
+
+        SetDropdownOptions();
+    }
+
+    private void OnEnable()
+    {
+        LocalizationSettings.SelectedLocaleChanged += OnLanguageChanged;
+    }
+
+    private void OnDisable()
+    {
+        LocalizationSettings.SelectedLocaleChanged -= OnLanguageChanged;
     }
 
     private void OnFpsSliderChanged(float value)
@@ -92,24 +110,48 @@ public class SettingsManager : MonoBehaviour
         volumeValueRect.position = new Vector3(xPosition, volumeValueRect.position.y, volumeValueRect.position.z);
     }
 
+    private void SetDropdownOptions()
+    {
+        graphicsQualityDropdown.options.Clear(); 
+
+        string localizedHigh = LocalizationSettings.StringDatabase.GetLocalizedString("highQuality");
+        string localizedMedium = LocalizationSettings.StringDatabase.GetLocalizedString("mediumQuality");
+        string localizedLow = LocalizationSettings.StringDatabase.GetLocalizedString("lowQuality");
+
+        graphicsQualityDropdown.options.Add(new TMP_Dropdown.OptionData(localizedHigh));
+        graphicsQualityDropdown.options.Add(new TMP_Dropdown.OptionData(localizedMedium));
+        graphicsQualityDropdown.options.Add(new TMP_Dropdown.OptionData(localizedLow));
+
+        graphicsQualityDropdown.RefreshShownValue(); 
+    }
+
+    private void OnLanguageChanged(Locale newLocale)
+    {
+        SetDropdownOptions();
+    }
+
     private void SaveSettings()
     {
         fpsLimit = Mathf.RoundToInt(fpsLimitSlider.value);
         volume = Mathf.RoundToInt(volumeSlider.value);
+        graphicsQuality = graphicsQualityDropdown.value;
 
         PlayerPrefs.SetInt("FpsLimit", fpsLimit);
         PlayerPrefs.SetInt("Volume", volume);
+        PlayerPrefs.SetInt("GraphicsQuality", graphicsQuality);
         PlayerPrefs.Save();
 
         var settingsData = new Dictionary<string, object>
         {
             { "fpsLimit", fpsLimit },
-            { "volume", volume }
+            { "volume", volume },
+            { "graphicsQuality", graphicsQuality }
         };
         CloudSaveService.Instance.Data.Player.SaveAsync(settingsData);
 
         Application.targetFrameRate = fpsLimit;
         AudioListener.volume = volume / 100f;
+        QualitySettings.SetQualityLevel(graphicsQuality, true);
 
         ReturnToMenu();
     }
@@ -122,21 +164,25 @@ public class SettingsManager : MonoBehaviour
         {
             fpsLimit = settingsData["fpsLimit"];
             volume = settingsData["volume"];
+            graphicsQuality = settingsData["graphicsQuality"];
         }
         else
         {
-            if (PlayerPrefs.HasKey("FpsLimit"))
+            if (PlayerPrefs.HasKey("FpsLimit") && PlayerPrefs.HasKey("Volume") && PlayerPrefs.HasKey("GraphicsQuality"))
             {
                 fpsLimit = PlayerPrefs.GetInt("FpsLimit", DefaultFpsLimit);
                 volume = PlayerPrefs.GetInt("Volume", DefaultVolume);
+                graphicsQuality = PlayerPrefs.GetInt("GraphicsQuality", DefaultGraphicsQuality);
             }
         }
 
         fpsLimitSlider.value = fpsLimit;
         volumeSlider.value = volume;
+        graphicsQualityDropdown.value = graphicsQuality;
 
         Application.targetFrameRate = fpsLimit;
         AudioListener.volume = volume / 100f;
+        QualitySettings.SetQualityLevel(graphicsQuality, true);
 
         fpsValueText.gameObject.SetActive(false);
         volumeValueText.gameObject.SetActive(false);
@@ -146,13 +192,14 @@ public class SettingsManager : MonoBehaviour
     {
         try
         {
-            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "fpsLimit", "volume" });
-            if (playerData.TryGetValue("fpsLimit", out var fpsValue) && playerData.TryGetValue("volume", out var volumeValue))
+            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "fpsLimit", "volume", "graphicsQuality" });
+            if (playerData.TryGetValue("fpsLimit", out var fpsValue) && playerData.TryGetValue("volume", out var volumeValue) && playerData.TryGetValue("graphicsQuality", out var graphicsQualityValue))
             {
                 return new Dictionary<string, int>
                 {
                     { "fpsLimit", fpsValue.Value.GetAs<int>() },
-                    { "volume", volumeValue.Value.GetAs<int>() }
+                    { "volume", volumeValue.Value.GetAs<int>() },
+                    { "graphicsQuality", graphicsQualityValue.Value.GetAs<int>() }
                 };
             }
             return null;
