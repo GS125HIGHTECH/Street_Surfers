@@ -122,6 +122,50 @@ MonoBehaviour:
     m_Localized: MAX LEVEL
     m_Metadata:
       m_Items: []
+  - m_Id: 500854123937792
+    m_Localized: Icons by <color=blue>icons8.com</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 501380475535360
+    m_Localized: Textures, 3D models and some sounds by <color=blue>assetstore.unity.com</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 502921412493312
+    m_Localized: Mouse Click and Car Acceleration Sound Effect by <color="blue">freesound_community</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 503899297693696
+    m_Localized: <color="blue">from Pixabay</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 505273112608768
+    m_Localized: Car Tire Sound Effect by <color=blue>quicksounds.com</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 505965097271296
+    m_Localized: Coin Sound Effect by <color="blue">Ribhav Agrawal</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506400642187264
+    m_Localized: App logo by <color=blue>Copilot AI</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 516729052872704
+    m_Localized: 'Graphics quality:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532339421888512
+    m_Localized: High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532369205641216
+    m_Localized: Medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532397647216640
+    m_Localized: Low
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

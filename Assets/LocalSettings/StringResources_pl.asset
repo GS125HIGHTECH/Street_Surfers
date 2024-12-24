@@ -122,6 +122,55 @@ MonoBehaviour:
     m_Localized: MAX POZIOM
     m_Metadata:
       m_Items: []
+  - m_Id: 500854123937792
+    m_Localized: 'Ikony: <color=blue>icons8.com</color>'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 501380475535360
+    m_Localized: "Tekstury, modele 3D i cz\u0119\u015B\u0107 dzwi\u0119k\xF3w: <color=blue>assetstore.unity.com</color>"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 502921412493312
+    m_Localized: "Efekty dzwi\u0119kowe (klikni\u0119cie myszk\u0105 i  zdobycie
+      ulepszenia pr\u0119dko\u015Bci): <color=\"blue\">freesound_community</color>\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 503899297693696
+    m_Localized: '<color="blue">z Pixabay</color>
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 505273112608768
+    m_Localized: 'Efekt pisku opon: <color=blue>quicksounds.com</color>'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 505965097271296
+    m_Localized: "Efekt d\u017Awi\u0119kowy monety: <color=\"blue\">Ribhav Agrawal</color>"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506400642187264
+    m_Localized: 'Logo aplikacji: <color=blue>Copilot AI</color>
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 516729052872704
+    m_Localized: "Jako\u015B\u0107 grafiki:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532339421888512
+    m_Localized: Wysoka
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532369205641216
+    m_Localized: "\u015Arednia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532397647216640
+    m_Localized: Niska
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
