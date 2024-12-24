@@ -94,6 +94,10 @@ public class LeaderboardManager : MonoBehaviour
         if (entryObject.TryGetComponent<TextMeshProUGUI>(out var textField))
         {
             textField.text = $"{rank}. {username} - {score:F2}";
+            if(AuthenticationManager.Instance.GetUsername() == username)
+            {
+                textField.fontStyle |= FontStyles.Underline;
+            }
         }
         else
         {

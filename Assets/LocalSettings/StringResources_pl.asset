@@ -1,0 +1,176 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: StringResources_pl
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: pl
+  m_SharedData: {fileID: 11400000, guid: 83af2a4f8bf708c4cb0d72a6d46b411c, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 474252328960
+    m_Localized: Street Surfers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3490338586624
+    m_Localized: "Nazwa u\u017Cytkownika..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3634819776512
+    m_Localized: "Has\u0142o..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4890091077632
+    m_Localized: "Powt\xF3rz has\u0142o..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5395253051392
+    m_Localized: Zarejestruj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5380690427904
+    m_Localized: Zaloguj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6063036579840
+    m_Localized: "Dotknij aby rozpocz\u0105\u0107..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6928048865280
+    m_Localized: "Zapami\u0119taj mnie"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8707037741056
+    m_Localized: "Masz ju\u017C konto?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8752441081856
+    m_Localized: Nie masz konta?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10214898417664
+    m_Localized: Profil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10904945311744
+    m_Localized: Ranking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11020343197696
+    m_Localized: Ulepsz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12000807895040
+    m_Localized: 'Koszt:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22630818398208
+    m_Localized: Zagraj ponownie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185267527106560
+    m_Localized: "Wzn\xF3w"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185377715666944
+    m_Localized: Ustawienia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185473576484864
+    m_Localized: Wyloguj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185598839373824
+    m_Localized: "Podzi\u0119kowania"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187089461460992
+    m_Localized: "G\u0142o\u015Bno\u015B\u0107:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187191303356416
+    m_Localized: 'Limit FPS:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187570124505088
+    m_Localized: Zapisz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 189275532705792
+    m_Localized: Koniec gry!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190240377815040
+    m_Localized: Ulepszenie prowadzenia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190235474673664
+    m_Localized: Ulepszenie czasu trwania
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190824006828032
+    m_Localized: MAX POZIOM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 500854123937792
+    m_Localized: 'Ikony: <color=blue>icons8.com</color>'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 501380475535360
+    m_Localized: "Tekstury, modele 3D i cz\u0119\u015B\u0107 dzwi\u0119k\xF3w: <color=blue>assetstore.unity.com</color>"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 502921412493312
+    m_Localized: "Efekty dzwi\u0119kowe (klikni\u0119cie myszk\u0105 i  zdobycie
+      ulepszenia pr\u0119dko\u015Bci): <color=\"blue\">freesound_community</color>\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 503899297693696
+    m_Localized: '<color="blue">z Pixabay</color>
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 505273112608768
+    m_Localized: 'Efekt pisku opon: <color=blue>quicksounds.com</color>'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 505965097271296
+    m_Localized: "Efekt d\u017Awi\u0119kowy monety: <color=\"blue\">Ribhav Agrawal</color>"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506400642187264
+    m_Localized: 'Logo aplikacji: <color=blue>Copilot AI</color>
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 516729052872704
+    m_Localized: "Jako\u015B\u0107 grafiki:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532339421888512
+    m_Localized: Wysoka
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532369205641216
+    m_Localized: "\u015Arednia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532397647216640
+    m_Localized: Niska
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []
