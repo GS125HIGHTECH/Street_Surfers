@@ -48,8 +48,9 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> speedBoosts = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
-
     private long coinCount = 0;
+    [SerializeField]
+    private long currentCoinCount = 0;
     private double bestScore = 0;
     public bool isLoggedIn = false;
     private bool isGamePlayable = false;
@@ -80,11 +81,14 @@ public class GameManager : MonoBehaviour
             gameOverCanvasGroup.alpha = 0f;
             gameOverPanel.SetActive(false);
         }
+
+        currentCoinCount = 0;
     }
 
     public async void AddCoin()
     {
         coinCount++;
+        currentCoinCount++;
 
         await SaveData("coins", coinCount);
     }
@@ -98,6 +102,11 @@ public class GameManager : MonoBehaviour
     public long GetCoinCount()
     {
         return coinCount;
+    }
+
+    public float GetCurrentCoinCount()
+    {
+        return currentCoinCount;
     }
 
 
@@ -544,6 +553,8 @@ public class GameManager : MonoBehaviour
         CancelInvoke(nameof(SpawnRoadSegment));
 
         gameOverPanel.SetActive(false);
+
+        currentCoinCount = 0;
     }
 
     public void LogOut()
