@@ -97,6 +97,14 @@ public class AudioManager : MonoBehaviour
         source.volume = startVolume;
     }
 
+    public void StopSpeedBoostSound()
+    {
+        if (speedBoostAudioSource.isPlaying)
+        {
+            speedBoostAudioSource.Stop();
+        }
+    }
+
     public void PlayEngineSound()
     {
         if (engineSound != null && engineAudioSource != null)
