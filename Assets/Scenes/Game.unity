@@ -8238,6 +8238,7 @@ MonoBehaviour:
   roadBlockerPrefab: {fileID: 100000, guid: 6148a4dd2f4929045a6bc3673a29ec30, type: 3}
   mandatoryCarriagewayPrefab: {fileID: 5502359255524751318, guid: 29bee7047918bf845bd83dee6ada4991, type: 3}
   speedBoostPrefab: {fileID: 4771864004028276163, guid: 2d7dd281b34b62a489324f9f74d4892d, type: 3}
+  currentCoinCount: 0
   isLoggedIn: 0
 --- !u!1 &746120349
 GameObject:
@@ -14547,6 +14548,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1355976757}
   m_CullTransparentMesh: 1
+--- !u!1 &1375622541
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1375622543}
+  - component: {fileID: 1375622542}
+  m_Layer: 0
+  m_Name: NotificationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1375622542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1375622541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40c2254fb286a554fa9527e02d4d342b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1375622543
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1375622541}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 643.5, y: 760, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1391076433
 GameObject:
   m_ObjectHideFlags: 0
@@ -23114,3 +23159,4 @@ SceneRoots:
   - {fileID: 746120351}
   - {fileID: 236800534}
   - {fileID: 1042650427}
+  - {fileID: 1375622543}

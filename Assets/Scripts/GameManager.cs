@@ -49,7 +49,6 @@ public class GameManager : MonoBehaviour
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
     private long coinCount = 0;
-    [SerializeField]
     private long currentCoinCount = 0;
     private double bestScore = 0;
     public bool isLoggedIn = false;
