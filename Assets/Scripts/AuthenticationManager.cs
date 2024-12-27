@@ -87,6 +87,8 @@ public class AuthenticationManager : MonoBehaviour
         loginPanel.SetActive(true);
         registerPanel.SetActive(false);
 
+        Time.timeScale = 1;
+
         loginPasswordToggle.ResetPasswordVisibility();
     }
 
