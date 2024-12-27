@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     private readonly float fadeDuration = 1.5f;
     private const float MinDistanceForBoost = 300f;
     private double lastBoostSpawnDistance = 0;
-    private readonly int maxSegmentsAhead = 40;
+    private readonly int maxSegmentsAhead = 35;
 
     private readonly Queue<GameObject> roadSegments = new();
     private readonly Queue<GameObject> coins = new();
@@ -81,6 +81,7 @@ public class GameManager : MonoBehaviour
             gameOverPanel.SetActive(false);
         }
 
+        nextSpawnPosition = new Vector3(0, 0, -10);
         currentCoinCount = 0;
     }
 
@@ -137,6 +138,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        RemoveOldObjects();
+    }
+
     private async Task InitializeCloudSave()
     {
         coinCount = await LoadData("coins", coinCount);
@@ -158,22 +164,20 @@ public class GameManager : MonoBehaviour
 
         if (isGamePlayable)
         {
+            currentCar.SetActive(isGamePlayable);
             startPanel.SetActive(false);
             coinsPanel.SetActive(true);
             AudioManager.Instance.PlayEngineSound();
             AttachCameraToCar();
             CarController.Instance.ResumeController();
-
             ResumeGame();
-
-            nextSpawnPosition = new Vector3(0, 0, -10);
 
             for (int i = 0; i < maxSegmentsAhead; i++)
             {
                 SpawnRoadSegment();
             }
 
-            InvokeRepeating(nameof(SpawnRoadSegment), 0f, spawnInterval);
+            InvokeRepeating(nameof(SpawnRoadSegment), 0.5f, spawnInterval);
         }
     }
 
@@ -188,6 +192,8 @@ public class GameManager : MonoBehaviour
         {
             CarController.Instance = carController;
         }
+
+        currentCar.SetActive(isGamePlayable);
     }
 
     private void AttachCameraToCar()
@@ -200,8 +206,6 @@ public class GameManager : MonoBehaviour
 
     private void SpawnRoadSegment()
     {
-        RemoveOldObjects();
-
         if (roadSegments.Count >= maxSegmentsAhead)
         {
             return;
@@ -210,7 +214,7 @@ public class GameManager : MonoBehaviour
         GameObject segment = Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
         roadSegments.Enqueue(segment);
 
-        if (nextSpawnPosition.z % 3 == 0 && nextSpawnPosition.z > 10)
+        if (nextSpawnPosition.z % 3 == 0 && nextSpawnPosition.z > 10 && nextSpawnPosition.z > mainCamera.transform.position.z)
         {
             SpawnCoins(nextSpawnPosition);
             SpawnStreetLamps(nextSpawnPosition);
@@ -431,6 +435,14 @@ public class GameManager : MonoBehaviour
         streetLamps.Enqueue(rightLamp);
     }
 
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (!pauseStatus && isGamePlayable && !settingsPanel.activeSelf && !creditsPanel.activeSelf)
+        {
+            PauseGame();
+        }
+    }
+
     public void ShowSettings()
     {
         menuPanel.SetActive(false);
@@ -537,7 +549,7 @@ public class GameManager : MonoBehaviour
             currentCar = null;
         }
 
-        nextSpawnPosition = Vector3.zero;
+        nextSpawnPosition = new Vector3(0, 0, -10); ;
         mainCamera.transform.position = nextSpawnPosition;
         isGamePlayable = false;
 
@@ -578,6 +590,7 @@ public class GameManager : MonoBehaviour
     public async void GameOver()
     {
         Time.timeScale = 0;
+        AudioManager.Instance.StopSpeedBoostSound();
 
         if (gameOverPanel != null)
         {
