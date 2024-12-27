@@ -531,7 +531,9 @@ public class GameManager : MonoBehaviour
 
         nextSpawnPosition = Vector3.zero;
         mainCamera.transform.position = nextSpawnPosition;
-        isGamePlayable = false; 
+        isGamePlayable = false;
+
+        CarController.Instance.ResetCurrentDistance();
 
         if (CarController.Instance != null)
         {
