@@ -244,6 +244,11 @@ public class CarController : MonoBehaviour
         return totalDistance;
     }
 
+    public float GetCurrentDistance()
+    {
+        return currentDistance;
+    }
+
     public void ResetCurrentDistance()
     {
         currentDistance = 0f;
