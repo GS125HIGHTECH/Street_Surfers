@@ -178,6 +178,26 @@ MonoBehaviour:
     m_Localized: Polish
     m_Metadata:
       m_Items: []
+  - m_Id: 1925841212948480
+    m_Localized: Collect Coins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925842072780800
+    m_Localized: Run Distance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925843251380224
+    m_Localized: Collect Speed Boosts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925843926663168
+    m_Localized: Change Lanes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1937930191126528
+    m_Localized: 'Mission completed:'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

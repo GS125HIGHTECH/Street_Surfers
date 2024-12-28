@@ -193,6 +193,8 @@ public class GameManager : MonoBehaviour
                 SpawnRoadSegment();
             }
 
+            await MissionManager.Instance.LoadMissionProgress();
+
             InvokeRepeating(nameof(SpawnRoadSegment), 0.5f, spawnInterval);
         }
     }

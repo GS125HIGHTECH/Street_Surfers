@@ -177,6 +177,26 @@ MonoBehaviour:
     m_Key: polish
     m_Metadata:
       m_Items: []
+  - m_Id: 1925841212948480
+    m_Key: collectCoins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925842072780800
+    m_Key: runDistance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925843251380224
+    m_Key: collectSpeedBoosts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925843926663168
+    m_Key: changeLanes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1937930191126528
+    m_Key: missionCompleted
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

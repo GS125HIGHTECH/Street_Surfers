@@ -183,6 +183,26 @@ MonoBehaviour:
     m_Localized: Polski
     m_Metadata:
       m_Items: []
+  - m_Id: 1925842072780800
+    m_Localized: Pokonaj dystans
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925841212948480
+    m_Localized: Zbierz monety
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925843251380224
+    m_Localized: "Zbierz ulepszenia pr\u0119dko\u015Bci"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925843926663168
+    m_Localized: "Zmie\u0144 pasy ruchu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1937930191126528
+    m_Localized: "Uko\u0144czono misj\u0119:"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
