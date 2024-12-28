@@ -28,11 +28,11 @@ public class CarController : MonoBehaviour
 
     private readonly float[] lanes = { -8f, 0f, 8f };
     private int currentLaneIndex = 1;
+    private int currentLaneChangeCount = 0;
     private bool isMobile = false;
     private bool isChangingLane = false;
     private bool isGamePlayable = false;
     private Coroutine speedCoroutine;
-    [SerializeField]
     private bool isBoostActive = false;
 
 
@@ -56,6 +56,7 @@ public class CarController : MonoBehaviour
         isMobile = Application.isMobilePlatform;
 
         currentDistance = 0;
+        currentLaneChangeCount = 0;
     }
 
     private void Update()
@@ -141,6 +142,7 @@ public class CarController : MonoBehaviour
         {
             currentLaneIndex = newLaneIndex;
             StartCoroutine(SmoothChangeLane(lanes[newLaneIndex]));
+            currentLaneChangeCount++;
         }
     }
 
@@ -249,9 +251,19 @@ public class CarController : MonoBehaviour
         return currentDistance;
     }
 
+    public int GetCurrentLaneChangeCount()
+    {
+        return currentLaneChangeCount;
+    }
+
     public void ResetCurrentDistance()
     {
         currentDistance = 0f;
+    }
+
+    public void ResetCurrentLaneChangeCount()
+    {
+        currentLaneChangeCount = 0;
     }
 
     public void ResumeController()

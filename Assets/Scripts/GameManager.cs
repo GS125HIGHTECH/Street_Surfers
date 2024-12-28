@@ -121,6 +121,11 @@ public class GameManager : MonoBehaviour
         return currentSpeedBoostCount;
     }
 
+    public bool IsGamePlayable()
+    {
+        return isGamePlayable;
+    }
+
     private void OnEnable()
     {
         AuthenticationManager.OnGameShown += StartSpawning;
@@ -565,6 +570,7 @@ public class GameManager : MonoBehaviour
         isGamePlayable = false;
 
         CarController.Instance.ResetCurrentDistance();
+        CarController.Instance.ResetCurrentLaneChangeCount();
 
         if (CarController.Instance != null)
         {
