@@ -165,6 +165,18 @@ MonoBehaviour:
     m_Key: lowQuality
     m_Metadata:
       m_Items: []
+  - m_Id: 1554827043946496
+    m_Key: language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1561586160648192
+    m_Key: english
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1561592959614976
+    m_Key: polish
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
