@@ -1,0 +1,210 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: StringResources Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: StringResources
+  m_TableCollectionNameGuidString: 83af2a4f8bf708c4cb0d72a6d46b411c
+  m_Entries:
+  - m_Id: 474252328960
+    m_Key: title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3490338586624
+    m_Key: username
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3634819776512
+    m_Key: password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4890091077632
+    m_Key: repeatPassword
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5380690427904
+    m_Key: login
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5395253051392
+    m_Key: register
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6063036579840
+    m_Key: touchToStart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6928048865280
+    m_Key: rememberMe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8707037741056
+    m_Key: alreadyHaveAccount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8752441081856
+    m_Key: dontHaveAccount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10214898417664
+    m_Key: profile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10904945311744
+    m_Key: leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11020343197696
+    m_Key: upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12000807895040
+    m_Key: cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 22630818398208
+    m_Key: restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185267527106560
+    m_Key: resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185377715666944
+    m_Key: settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185473576484864
+    m_Key: signOut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 185598839373824
+    m_Key: credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187089461460992
+    m_Key: volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187191303356416
+    m_Key: fpsLimit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 187570124505088
+    m_Key: save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 189275532705792
+    m_Key: gameOver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190235474673664
+    m_Key: boostDurationUpgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190240377815040
+    m_Key: handlingUpgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 190824006828032
+    m_Key: maxLevel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 500854123937792
+    m_Key: 'iconsBy
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 501380475535360
+    m_Key: texturesModelsSoundsBy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 502921412493312
+    m_Key: mouseClickCarAccelerationSoundBy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 503899297693696
+    m_Key: fromPixabay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 505273112608768
+    m_Key: carTireSoundBy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 505965097271296
+    m_Key: coinSoundBy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506400642187264
+    m_Key: appLogoBy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 516729052872704
+    m_Key: graphicsQuality
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532339421888512
+    m_Key: highQuality
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532369205641216
+    m_Key: mediumQuality
+    m_Metadata:
+      m_Items: []
+  - m_Id: 532397647216640
+    m_Key: lowQuality
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1554827043946496
+    m_Key: language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1561586160648192
+    m_Key: english
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1561592959614976
+    m_Key: polish
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925841212948480
+    m_Key: collectCoins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925842072780800
+    m_Key: runDistance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925843251380224
+    m_Key: collectSpeedBoosts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1925843926663168
+    m_Key: changeLanes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1937930191126528
+    m_Key: missionCompleted
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 406039179047731480
+  references:
+    version: 2
+    RefIds:
+    - rid: 406039179047731480
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1734948698959

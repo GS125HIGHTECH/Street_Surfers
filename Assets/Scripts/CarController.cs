@@ -14,6 +14,8 @@ public class CarController : MonoBehaviour
     [SerializeField]
     private float currentSpeed = 2.5f;
     private double totalDistance = 0;
+    [SerializeField]
+    private float currentDistance = 0;
 
     private readonly float wheelRotationBaseSpeed = 90f;
 
@@ -26,11 +28,11 @@ public class CarController : MonoBehaviour
 
     private readonly float[] lanes = { -8f, 0f, 8f };
     private int currentLaneIndex = 1;
+    private int currentLaneChangeCount = 0;
     private bool isMobile = false;
     private bool isChangingLane = false;
     private bool isGamePlayable = false;
     private Coroutine speedCoroutine;
-    [SerializeField]
     private bool isBoostActive = false;
 
 
@@ -52,6 +54,9 @@ public class CarController : MonoBehaviour
     private void Start()
     {
         isMobile = Application.isMobilePlatform;
+
+        currentDistance = 0;
+        currentLaneChangeCount = 0;
     }
 
     private void Update()
@@ -62,6 +67,7 @@ public class CarController : MonoBehaviour
         float distancePerFrame = currentSpeed * Time.deltaTime;
 
         totalDistance += distancePerFrame;
+        currentDistance += distancePerFrame;
 
         transform.Translate(distancePerFrame * Vector3.right);
 
@@ -126,11 +132,6 @@ public class CarController : MonoBehaviour
                 ChangeLane(-1);
             }
         }
-
-        //if(Keyboard.current.spaceKey.wasPressedThisFrame)
-        //{
-        //    StartCoroutine(ApplySpeedBoost());
-        //}
     }
 
     private void ChangeLane(int direction)
@@ -141,6 +142,7 @@ public class CarController : MonoBehaviour
         {
             currentLaneIndex = newLaneIndex;
             StartCoroutine(SmoothChangeLane(lanes[newLaneIndex]));
+            currentLaneChangeCount++;
         }
     }
 
@@ -242,6 +244,26 @@ public class CarController : MonoBehaviour
     public double GetTotalDistance()
     {
         return totalDistance;
+    }
+
+    public float GetCurrentDistance()
+    {
+        return currentDistance;
+    }
+
+    public int GetCurrentLaneChangeCount()
+    {
+        return currentLaneChangeCount;
+    }
+
+    public void ResetCurrentDistance()
+    {
+        currentDistance = 0f;
+    }
+
+    public void ResetCurrentLaneChangeCount()
+    {
+        currentLaneChangeCount = 0;
     }
 
     public void ResumeController()

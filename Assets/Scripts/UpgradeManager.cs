@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 public class UpgradeManager : MonoBehaviour
@@ -38,6 +40,21 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        LocalizationSettings.SelectedLocaleChanged += OnLanguageChanged;
+    }
+
+    private void OnDisable()
+    {
+        LocalizationSettings.SelectedLocaleChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(Locale newLocale)
+    {
+        UpdateUpgradeUI();
+    }
+
     public async void UpgradeHandling()
     {
         if (handlingLevel < maxLevel)
@@ -52,10 +69,6 @@ public class UpgradeManager : MonoBehaviour
                 CarController.Instance.UpdateHandling(1f - (handlingLevel * 0.1f));
                 await SaveUpgradeData();
                 UpdateUpgradeUI();
-            }
-            else
-            {
-                Debug.Log("Not enough coins to upgrade handling.");
             }
         }
     }
@@ -75,30 +88,28 @@ public class UpgradeManager : MonoBehaviour
                 await SaveUpgradeData();
                 UpdateUpgradeUI();
             }
-            else
-            {
-                Debug.Log("Not enough coins to upgrade boost duration.");
-            }
         }
     }
 
     private async void UpdateUpgradeUI()
     {
+        string localizedHandling = LocalizationSettings.StringDatabase.GetLocalizedString("handlingUpgrade");
+        string localizedBoostDuration = LocalizationSettings.StringDatabase.GetLocalizedString("boostDurationUpgrade");
+
         currentCoinCount = await GameManager.Instance.GetCoinCountAsync();
-        Debug.Log($"Current coins: {currentCoinCount}");
 
         coinCountText.text = UIManager.Instance.FormatNumber(currentCoinCount);
 
         UpdateEntryUI(
             handlingUpgradeEntry,
-            "Handling Upgrade",
+            localizedHandling,
             handlingLevel < maxLevel ? handlingUpgradeCosts[handlingLevel] : 0,
             handlingLevel < maxLevel
         );
 
         UpdateEntryUI(
             boostUpgradeEntry,
-            "Boost Duration Upgrade",
+            localizedBoostDuration,
             boostDurationLevel < maxLevel ? boostUpgradeCosts[boostDurationLevel] : 0,
             boostDurationLevel < maxLevel
         );
@@ -112,14 +123,17 @@ public class UpgradeManager : MonoBehaviour
 
         if (isUpgradable)
         {
+            string localizedCost = LocalizationSettings.StringDatabase.GetLocalizedString("cost");
             nameText.text = upgradeName;
-            costText.text = $"Cost: {cost}";
+            costText.text = $"{localizedCost} {cost}";
 
             upgradeButton.interactable = currentCoinCount >= cost;
         }
         else
         {
-            nameText.text = $"{upgradeName} - MAX LEVEL";
+            string localizedMaxLevel = LocalizationSettings.StringDatabase.GetLocalizedString("maxLevel");
+
+            nameText.text = $"{upgradeName} - {localizedMaxLevel}";
             costText.text = string.Empty;
             upgradeButton.interactable = false;
         }
@@ -131,12 +145,14 @@ public class UpgradeManager : MonoBehaviour
         {
             boostUpgradeEntryButton.interactable = false;
             handlingUpgradeEntryButton.interactable = false;
-            await LoadUpgradeData();
+     
             AudioManager.Instance.PlayClickSound();
             GameManager.Instance.touchScreenText.SetActive(false);
             GameManager.Instance.leaderboardPanel.SetActive(false);
             GameManager.Instance.profilePanel.SetActive(false);
             GameManager.Instance.upgradePanel.SetActive(true);
+
+            await LoadUpgradeData();
         }
     }
 
