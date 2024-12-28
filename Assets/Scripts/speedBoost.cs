@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class SpeedBoost : MonoBehaviour
@@ -11,6 +10,7 @@ public class SpeedBoost : MonoBehaviour
             AudioManager.Instance.PlaySpeedBoostSound();
 
             CarController.Instance.StartSpeedBoost();
+            GameManager.Instance.AddSpeedBoost();
         }
     }
 }
