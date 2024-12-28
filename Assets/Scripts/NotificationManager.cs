@@ -1,4 +1,3 @@
-using Unity.Notifications;
 using Unity.Notifications.Android;
 using UnityEngine;
 using UnityEngine.Android;
