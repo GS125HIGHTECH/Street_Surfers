@@ -145,12 +145,14 @@ public class UpgradeManager : MonoBehaviour
         {
             boostUpgradeEntryButton.interactable = false;
             handlingUpgradeEntryButton.interactable = false;
-            await LoadUpgradeData();
+     
             AudioManager.Instance.PlayClickSound();
             GameManager.Instance.touchScreenText.SetActive(false);
             GameManager.Instance.leaderboardPanel.SetActive(false);
             GameManager.Instance.profilePanel.SetActive(false);
             GameManager.Instance.upgradePanel.SetActive(true);
+
+            await LoadUpgradeData();
         }
     }
 
