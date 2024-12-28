@@ -166,6 +166,18 @@ MonoBehaviour:
     m_Localized: Low
     m_Metadata:
       m_Items: []
+  - m_Id: 1554827043946496
+    m_Localized: 'Language:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1561586160648192
+    m_Localized: English
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1561592959614976
+    m_Localized: Polish
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
