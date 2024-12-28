@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
     private Camera mainCamera;
     private long coinCount = 0;
     private long currentCoinCount = 0;
+    private int currentSpeedBoostCount = 0;
     private double bestScore = 0;
     public bool isLoggedIn = false;
     private bool isGamePlayable = false;
@@ -83,6 +84,7 @@ public class GameManager : MonoBehaviour
 
         nextSpawnPosition = new Vector3(0, 0, -10);
         currentCoinCount = 0;
+        currentSpeedBoostCount = 0;
     }
 
     public async void AddCoin()
@@ -91,6 +93,11 @@ public class GameManager : MonoBehaviour
         currentCoinCount++;
 
         await SaveData("coins", coinCount);
+    }
+
+    public void AddSpeedBoost()
+    {
+        currentSpeedBoostCount++;
     }
 
     public async Task<long> GetCoinCountAsync()
@@ -109,6 +116,10 @@ public class GameManager : MonoBehaviour
         return currentCoinCount;
     }
 
+    public int GetCurrentSpeedBoostCount()
+    {
+        return currentSpeedBoostCount;
+    }
 
     private void OnEnable()
     {
@@ -566,6 +577,7 @@ public class GameManager : MonoBehaviour
         gameOverPanel.SetActive(false);
 
         currentCoinCount = 0;
+        currentSpeedBoostCount = 0;
     }
 
     public void LogOut()
