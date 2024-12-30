@@ -15,6 +15,8 @@ public class LeaderboardManager : MonoBehaviour
     public Transform content;
     public GameObject entryPrefab;
 
+    private readonly List<(int rank, string username, double score)> cachedLeaderboardEntries = new();
+
     private void Awake()
     {
         if (Instance == null)
@@ -47,7 +49,7 @@ public class LeaderboardManager : MonoBehaviour
 
     public async void FetchLeaderboardScores()
     {
-        try
+        if (Application.internetReachability != NetworkReachability.NotReachable)
         {
             foreach (Transform child in content)
             {
@@ -55,6 +57,14 @@ public class LeaderboardManager : MonoBehaviour
             }
 
             var scoresResponse = await LeaderboardsService.Instance.GetScoresAsync(LeaderboardId, new GetScoresOptions { IncludeMetadata = true });
+
+            cachedLeaderboardEntries.Clear();
+
+            if (scoresResponse.Results == null || scoresResponse.Results.Count == 0)
+            {
+                ShowCachedLeaderboard();
+                return;
+            }
 
             foreach (var scoreEntry in scoresResponse.Results)
             {
@@ -78,12 +88,35 @@ public class LeaderboardManager : MonoBehaviour
                         Debug.LogError($"Error parsing metadata: {jsonException.Message}");
                     }
                 }
+                cachedLeaderboardEntries.Add((scoreEntry.Rank + 1, username, score));
                 CreateLeaderboardEntry(scoreEntry.Rank + 1, username, score);
             }
         }
-        catch (Exception e)
+        else
         {
-            Debug.LogError($"Error retrieving leaderboard scores: {e.Message}");
+            ShowCachedLeaderboard();
+        }
+    }
+
+    private async void ShowCachedLeaderboard()
+    {
+        foreach (Transform child in content)
+        {
+            Destroy(child.gameObject);
+        }
+        if (cachedLeaderboardEntries.Count > 0)
+        {
+            foreach (var (rank, username, score) in cachedLeaderboardEntries)
+            {
+                CreateLeaderboardEntry(rank, username, score);
+            }
+        }
+        else
+        {
+            string username = AuthenticationManager.Instance.GetUsername();
+            double bestScore = await GameManager.Instance.LoadData("bestScore", 0.0, true);
+
+            CreateLeaderboardEntry(1, username, bestScore);
         }
     }
 
