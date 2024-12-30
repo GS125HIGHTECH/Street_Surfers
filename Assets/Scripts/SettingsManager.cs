@@ -153,20 +153,23 @@ public class SettingsManager : MonoBehaviour
         graphicsQuality = graphicsQualityDropdown.value;
         language = languageDropdown.value;
 
-        PlayerPrefs.SetInt("FpsLimit", fpsLimit);
-        PlayerPrefs.SetInt("Volume", volume);
-        PlayerPrefs.SetInt("GraphicsQuality", graphicsQuality);
-        PlayerPrefs.SetInt("Language", language);
+        PlayerPrefs.SetInt("fpsLimit", fpsLimit);
+        PlayerPrefs.SetInt("volume", volume);
+        PlayerPrefs.SetInt("graphicsQuality", graphicsQuality);
+        PlayerPrefs.SetInt("language", language);
         PlayerPrefs.Save();
 
-        var settingsData = new Dictionary<string, object>
+        if (Application.internetReachability != NetworkReachability.NotReachable)
         {
-            { "fpsLimit", fpsLimit },
-            { "volume", volume },
-            { "graphicsQuality", graphicsQuality },
-            { "language", language },
-        };
-        CloudSaveService.Instance.Data.Player.SaveAsync(settingsData);
+            var settingsData = new Dictionary<string, object>
+            {
+                { "fpsLimit", fpsLimit },
+                { "volume", volume },
+                { "graphicsQuality", graphicsQuality },
+                { "language", language },
+            };
+            CloudSaveService.Instance.Data.Player.SaveAsync(settingsData);
+        }
 
         Application.targetFrameRate = fpsLimit;
         AudioListener.volume = volume / 100f;
@@ -190,12 +193,12 @@ public class SettingsManager : MonoBehaviour
         }
         else
         {
-            if (PlayerPrefs.HasKey("FpsLimit") && PlayerPrefs.HasKey("Volume") && PlayerPrefs.HasKey("GraphicsQuality") && PlayerPrefs.HasKey("Language"))
+            if (PlayerPrefs.HasKey("fpsLimit") && PlayerPrefs.HasKey("volume") && PlayerPrefs.HasKey("graphicsQuality") && PlayerPrefs.HasKey("language"))
             {
-                fpsLimit = PlayerPrefs.GetInt("FpsLimit", DefaultFpsLimit);
-                volume = PlayerPrefs.GetInt("Volume", DefaultVolume);
-                graphicsQuality = PlayerPrefs.GetInt("GraphicsQuality", DefaultGraphicsQuality);
-                language = PlayerPrefs.GetInt("Language", DefaultLanguage);
+                fpsLimit = PlayerPrefs.GetInt("fpsLimit", DefaultFpsLimit);
+                volume = PlayerPrefs.GetInt("volume", DefaultVolume);
+                graphicsQuality = PlayerPrefs.GetInt("graphicsQuality", DefaultGraphicsQuality);
+                language = PlayerPrefs.GetInt("language", DefaultLanguage);
             }
         }
 
@@ -216,24 +219,31 @@ public class SettingsManager : MonoBehaviour
 
     private async Task<Dictionary<string, int>> LoadSettingsFromCloud()
     {
-        try
+        if (Application.internetReachability != NetworkReachability.NotReachable)
         {
-            var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "fpsLimit", "volume", "graphicsQuality", "language" });
-            if (playerData.TryGetValue("fpsLimit", out var fpsValue) && playerData.TryGetValue("volume", out var volumeValue) && playerData.TryGetValue("graphicsQuality", out var graphicsQualityValue) && playerData.TryGetValue("language", out var languageValue))
+            try
             {
-                return new Dictionary<string, int>
+                var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "fpsLimit", "volume", "graphicsQuality", "language" });
+                if (playerData.TryGetValue("fpsLimit", out var fpsValue) && playerData.TryGetValue("volume", out var volumeValue) && playerData.TryGetValue("graphicsQuality", out var graphicsQualityValue) && playerData.TryGetValue("language", out var languageValue))
+                {
+                    return new Dictionary<string, int>
                 {
                     { "fpsLimit", fpsValue.Value.GetAs<int>() },
                     { "volume", volumeValue.Value.GetAs<int>() },
                     { "graphicsQuality", graphicsQualityValue.Value.GetAs<int>() },
                     { "language", languageValue.Value.GetAs<int>() }
                 };
+                }
+                return null;
             }
-            return null;
+            catch (Exception e)
+            {
+                Debug.LogError($"Error loading cloud settings: {e.Message}");
+                return null;
+            }
         }
-        catch (Exception e)
+        else
         {
-            Debug.LogError($"Error loading cloud settings: {e.Message}");
             return null;
         }
     }
