@@ -21,6 +21,7 @@ public class MissionManager : MonoBehaviour
     private readonly Queue<string> notificationQueue = new();
     private bool canCloseDropdown = true;
     private bool isProcessingQueue = false;
+    private readonly float additionalBoost = 0.5f;
 
     private void Awake()
     {
@@ -86,10 +87,10 @@ public class MissionManager : MonoBehaviour
         string localizedCollectSpeedBoosts = LocalizationSettings.StringDatabase.GetLocalizedString("collectSpeedBoosts");
         string localizedChangeLanes = LocalizationSettings.StringDatabase.GetLocalizedString("changeLanes");
 
-        activeMissions.Add(new Mission("Collect Coins", localizedCollectCoins, new[] { 20, 50, 100, 200, 500, 1000, 2000 }, MissionType.Coins));
-        activeMissions.Add(new Mission("Run Distance", localizedRunDistance, new[] { 500, 1000, 2000, 5000, 10000 }, MissionType.Distance));
-        activeMissions.Add(new Mission("Collect Speed Boosts", localizedCollectSpeedBoosts, new[] { 1, 2, 3, 5, 10 }, MissionType.SpeedBoost));
-        activeMissions.Add(new Mission("Change Lanes", localizedChangeLanes, new[] { 20, 50, 100, 200,  }, MissionType.LaneChange));
+        activeMissions.Add(new Mission("Collect Coins", localizedCollectCoins, new[] { 20, 50, 100, 200, 300, 500, 800, 1000, 1200, 1500 }, MissionType.Coins));
+        activeMissions.Add(new Mission("Run Distance", localizedRunDistance, new[] { 500, 1000, 2000, 3000, 5000, 8000, 10000, 15000, 20000, 25000 }, MissionType.Distance));
+        activeMissions.Add(new Mission("Collect Speed Boosts", localizedCollectSpeedBoosts, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, MissionType.SpeedBoost));
+        activeMissions.Add(new Mission("Change Lanes", localizedChangeLanes, new[] { 20, 40, 80, 100, 150, 200, 300, 400, 500, 1000 }, MissionType.LaneChange));
     }
 
     private void UpdateMissionDisplayNames()
@@ -154,6 +155,8 @@ public class MissionManager : MonoBehaviour
             ShowNotification(message);
 
             mission.AdvanceToNextGoal();
+            CarController.Instance.IncreaseDistanceBoost(additionalBoost);
+
             await SaveMissionProgress();
         }
     }
@@ -205,15 +208,21 @@ public class MissionManager : MonoBehaviour
 
     public async Task LoadMissionProgress()
     {
+        int completedMissions = 0;
+
         foreach (var mission in activeMissions)
         {
             string formattedKey = FormatMissionKey(mission.Name);
-            int savedLevel = await GameManager.Instance.LoadData($"mission_{formattedKey}_level", 0);
+            int savedLevel = await GameManager.Instance.LoadData($"mission_{formattedKey}_level", 0, true);
             mission.SetCurrentGoalIndex(savedLevel);
+            completedMissions += savedLevel;
         }
+
+        float newBoost = completedMissions * additionalBoost;
+        CarController.Instance.SetDistanceBoost(newBoost);
     }
 
-    private async Task SaveMissionProgress()
+    public async Task SaveMissionProgress()
     {
         foreach (var mission in activeMissions)
         {
