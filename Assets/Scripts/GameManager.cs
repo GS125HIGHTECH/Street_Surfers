@@ -512,9 +512,13 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
+        if(!CarController.Instance.isBoostActive && !CarController.Instance.isChangingLane)
+        {
+            AudioManager.Instance.PlayClickSound();
         ShowMenu();
         Time.timeScale = 0;
         AudioManager.Instance.StopEngineSound();
+    }
     }
 
     public void RestartGameOver()
