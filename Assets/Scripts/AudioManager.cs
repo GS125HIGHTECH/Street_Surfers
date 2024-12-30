@@ -21,6 +21,7 @@ public class AudioManager : MonoBehaviour
 
     private float lastPlayTime;
     private const float minPlayInterval = 0.1f;
+    private bool isPaused = false;
 
     private void Awake()
     {
@@ -121,6 +122,38 @@ public class AudioManager : MonoBehaviour
         {
             engineAudioSource.loop = false; 
             engineAudioSource.Stop();  
+        }
+    }
+
+    public void PauseAllSounds()
+    {
+        isPaused = true;
+        PauseAudioSource(tiresAudioSource);
+        PauseAudioSource(coinAudioSource);
+        PauseAudioSource(speedBoostAudioSource);
+    }
+
+    public void ResumeAllSounds()
+    {
+        isPaused = false;
+        ResumeAudioSource(tiresAudioSource);
+        ResumeAudioSource(coinAudioSource);
+        ResumeAudioSource(speedBoostAudioSource);
+    }
+
+    private void PauseAudioSource(AudioSource source)
+    {
+        if (source.isPlaying)
+        {
+            source.Pause();
+        }
+    }
+
+    private void ResumeAudioSource(AudioSource source)
+    {
+        if (source.clip != null && isPaused)
+        {
+            source.UnPause();
         }
     }
 }

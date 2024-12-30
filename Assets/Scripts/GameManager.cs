@@ -500,6 +500,7 @@ public class GameManager : MonoBehaviour
     public void ResumeGame()
     {
         HideMenu();
+        AudioManager.Instance.ResumeAllSounds();
         Time.timeScale = 1;
         AudioManager.Instance.PlayEngineSound();
     }
@@ -515,10 +516,11 @@ public class GameManager : MonoBehaviour
         if(!CarController.Instance.isBoostActive && !CarController.Instance.isChangingLane)
         {
             AudioManager.Instance.PlayClickSound();
-        ShowMenu();
-        Time.timeScale = 0;
-        AudioManager.Instance.StopEngineSound();
-    }
+            ShowMenu();
+            AudioManager.Instance.PauseAllSounds();
+            Time.timeScale = 0;
+            AudioManager.Instance.StopEngineSound();
+        }
     }
 
     public void RestartGameOver()
@@ -603,8 +605,6 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         RestartGame();
-
-        AudioManager.Instance.StopEngineSound();
 
         AuthenticationService.Instance.SignOut();
 
