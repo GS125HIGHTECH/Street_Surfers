@@ -13,7 +13,6 @@ public class CarController : MonoBehaviour
 
     [SerializeField]
     private float currentSpeed = 2.5f;
-    private double totalDistance = 0;
     [SerializeField]
     private float currentDistance = 0;
 
@@ -34,6 +33,10 @@ public class CarController : MonoBehaviour
     private bool isGamePlayable = false;
     private Coroutine speedCoroutine;
     public bool isBoostActive = false;
+    [SerializeField]
+    private float distanceBoost = 0f;
+    [SerializeField]
+    private float baseDistance = 0f;
 
 
     private void Awake()
@@ -65,9 +68,9 @@ public class CarController : MonoBehaviour
             return;
 
         float distancePerFrame = currentSpeed * Time.deltaTime;
+        baseDistance += distancePerFrame;
 
-        totalDistance += distancePerFrame;
-        currentDistance += distancePerFrame;
+        currentDistance += distancePerFrame * (1 + distanceBoost);
 
         transform.Translate(distancePerFrame * Vector3.right);
 
@@ -218,10 +221,7 @@ public class CarController : MonoBehaviour
         laneChangeDuration = Mathf.Clamp(newHandling, 0.1f, 1f);
     }
 
-    public void UpdateBoostDuration(float newDuration)
-    {
-        boostDuration = newDuration;
-    }
+    public void UpdateBoostDuration(float newDuration) => boostDuration = newDuration;
 
     public void StartSpeedBoost()
     {
@@ -241,30 +241,19 @@ public class CarController : MonoBehaviour
         isBoostActive = false;
     }
 
-    public double GetTotalDistance()
-    {
-        return totalDistance;
-    }
+    public float GetCurrentDistance() => currentDistance;
 
-    public float GetCurrentDistance()
-    {
-        return currentDistance;
-    }
+    public float GetDistanceBoost() => distanceBoost;
 
-    public int GetCurrentLaneChangeCount()
-    {
-        return currentLaneChangeCount;
-    }
+    public int GetCurrentLaneChangeCount() => currentLaneChangeCount;
 
-    public void ResetCurrentDistance()
-    {
-        currentDistance = 0f;
-    }
+    public void ResetCurrentDistance() => currentDistance = 0f;
 
-    public void ResetCurrentLaneChangeCount()
-    {
-        currentLaneChangeCount = 0;
-    }
+    public void ResetCurrentLaneChangeCount() => currentLaneChangeCount = 0;
+
+    public void SetDistanceBoost(float newBoost) => distanceBoost = newBoost;
+
+    public void IncreaseDistanceBoost(float boost) => distanceBoost += boost;
 
     public void ResumeController()
     {
