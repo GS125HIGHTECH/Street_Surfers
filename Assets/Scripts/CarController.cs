@@ -38,7 +38,6 @@ public class CarController : MonoBehaviour
     [SerializeField]
     private float baseDistance = 0f;
 
-
     private void Awake()
     {
         if (Instance == null)
@@ -54,12 +53,14 @@ public class CarController : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Start()
+    private async void Start()
     {
         isMobile = Application.isMobilePlatform;
 
         currentDistance = 0;
         currentLaneChangeCount = 0;
+        await MissionManager.Instance.LoadMissionProgress();
+        await MissionManager.Instance.SaveMissionProgress();
     }
 
     private void Update()
