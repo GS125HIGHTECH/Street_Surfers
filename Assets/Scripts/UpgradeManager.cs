@@ -153,6 +153,7 @@ public class UpgradeManager : MonoBehaviour
             GameManager.Instance.upgradePanel.SetActive(true);
 
             await LoadUpgradeData();
+            await SaveUpgradeData();
         }
     }
 
@@ -175,7 +176,7 @@ public class UpgradeManager : MonoBehaviour
         UpdateUpgradeUI();
     }
 
-    private async Task SaveUpgradeData()
+    public async Task SaveUpgradeData()
     {
         await GameManager.Instance.SaveData("coins", currentCoinCount);
         await GameManager.Instance.SaveData("handlingLevel", handlingLevel);
