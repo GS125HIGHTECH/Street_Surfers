@@ -24,8 +24,8 @@ public class UpgradeManager : MonoBehaviour
     private long currentCoinCount = 0;
 
     private const int maxLevel = 6;
-    private readonly int[] handlingUpgradeCosts = { 500, 2000, 5000, 10000, 20000, 50000 };
-    private readonly int[] boostUpgradeCosts = { 500, 2000, 5000, 10000, 20000, 50000 };
+    private readonly int[] handlingUpgradeCosts = { 100, 200, 500, 1000, 2000, 5000 };
+    private readonly int[] boostUpgradeCosts = { 100, 200, 500, 1000, 2000, 5000 };
 
     private void Awake()
     {
