@@ -30,10 +30,10 @@ public class CarController : MonoBehaviour
     private int currentLaneIndex = 1;
     private int currentLaneChangeCount = 0;
     private bool isMobile = false;
-    private bool isChangingLane = false;
+    public bool isChangingLane = false;
     private bool isGamePlayable = false;
     private Coroutine speedCoroutine;
-    private bool isBoostActive = false;
+    public bool isBoostActive = false;
 
 
     private void Awake()
