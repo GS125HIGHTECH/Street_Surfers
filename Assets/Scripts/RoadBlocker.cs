@@ -9,8 +9,6 @@ public class RoadBlocker : MonoBehaviour
             AudioManager.Instance.StopEngineSound();
             AudioManager.Instance.PlayCarCrashSound();
 
-            Debug.Log("Car crashed!");
-
             GameManager.Instance.GameOver();
         }
     }

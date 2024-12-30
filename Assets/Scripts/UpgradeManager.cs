@@ -165,10 +165,10 @@ public class UpgradeManager : MonoBehaviour
 
     public async Task LoadUpgradeData()
     {
-        currentCoinCount = await GameManager.Instance.LoadData<long>("coins", 0);
+        currentCoinCount = await GameManager.Instance.LoadData("coins", currentCoinCount, true);
 
-        handlingLevel = await GameManager.Instance.LoadData<int>("handlingLevel", 0);
-        boostDurationLevel = await GameManager.Instance.LoadData<int>("boostDurationLevel", 0);
+        handlingLevel = await GameManager.Instance.LoadData("handlingLevel", handlingLevel, true);
+        boostDurationLevel = await GameManager.Instance.LoadData("boostDurationLevel", boostDurationLevel, true);
 
         CarController.Instance.UpdateHandling(1f - (handlingLevel * 0.1f));
         CarController.Instance.UpdateBoostDuration(2f + (boostDurationLevel * 2f));

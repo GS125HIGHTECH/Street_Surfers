@@ -171,7 +171,6 @@ public class AuthenticationManager : MonoBehaviour
         try
         {
             await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username, password);
-            Debug.Log("Login successful!");
 
             if (saveLoginToggle.isOn)
             {
@@ -234,11 +233,9 @@ public class AuthenticationManager : MonoBehaviour
         try
         {
             await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(username, password);
-            Debug.Log("Registration successful!");
 
             var data = new Dictionary<string, object> { { "username", username } };
             await CloudSaveService.Instance.Data.Player.SaveAsync(data);
-            Debug.Log("Username saved to Cloud Save!");
 
             if (saveRegisterToggle.isOn)
             {
