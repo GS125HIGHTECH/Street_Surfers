@@ -242,6 +242,8 @@ public class CarController : MonoBehaviour
 
     public float GetCurrentDistance() => currentDistance;
 
+    public float GetBaseDistance() => baseDistance;
+
     public float GetDistanceBoost() => distanceBoost;
 
     public int GetCurrentLaneChangeCount() => currentLaneChangeCount;
