@@ -151,10 +151,12 @@ public class GameManager : MonoBehaviour
 
         bestScore = await LoadData("bestScore", 0.0, true);
 
+        double roundedDistance = Math.Floor(bestScore * 100) / 100;
+        LeaderboardManager.Instance.AddScoreToLeaderboard(roundedDistance);
+
         await GetCoinCountAsync();
         await UpgradeManager.Instance.LoadUpgradeData();
         await MissionManager.Instance.LoadMissionProgress();
-        await SaveBestScoreAsync(bestScore);
     }
 
     private void StartSpawning()
@@ -513,6 +515,13 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        StartCoroutine(StartGameWithDelay());
+    }
+
+    private IEnumerator StartGameWithDelay()
+    {
+        yield return new WaitForSeconds(0.5f);
+
         isGamePlayable = true;
         StartSpawning();
     }
