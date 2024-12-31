@@ -229,12 +229,12 @@ public class SettingsManager : MonoBehaviour
                 if (playerData.TryGetValue("fpsLimit", out var fpsValue) && playerData.TryGetValue("volume", out var volumeValue) && playerData.TryGetValue("graphicsQuality", out var graphicsQualityValue) && playerData.TryGetValue("language", out var languageValue))
                 {
                     return new Dictionary<string, int>
-                {
-                    { "fpsLimit", fpsValue.Value.GetAs<int>() },
-                    { "volume", volumeValue.Value.GetAs<int>() },
-                    { "graphicsQuality", graphicsQualityValue.Value.GetAs<int>() },
-                    { "language", languageValue.Value.GetAs<int>() }
-                };
+                    {
+                        { "fpsLimit", fpsValue.Value.GetAs<int>() },
+                        { "volume", volumeValue.Value.GetAs<int>() },
+                        { "graphicsQuality", graphicsQualityValue.Value.GetAs<int>() },
+                        { "language", languageValue.Value.GetAs<int>() }
+                    };
                 }
                 return null;
             }
