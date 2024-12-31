@@ -106,10 +106,12 @@ public class SettingsManager : MonoBehaviour
         string systemLanguage = LocalizationSettings.SelectedLocale.Identifier.Code;
         if (systemLanguage == "pl")
         {
+            language = 1;
             languageDropdown.value = 1;
         }
         else
         {
+            language = 0;
             languageDropdown.value = 0;
         }
     }
