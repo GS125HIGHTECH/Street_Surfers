@@ -182,7 +182,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1925842072780800
-    m_Key: runDistance
+    m_Key: driveDistance
     m_Metadata:
       m_Items: []
   - m_Id: 1925843251380224
@@ -195,6 +195,38 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1937930191126528
     m_Key: missionCompleted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3007508019167232
+    m_Key: usernameNotEmpty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3007955605929984
+    m_Key: passwordNotEmpty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3008160837419008
+    m_Key: repeatPasswordNotEmpty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3008807120945152
+    m_Key: passwordsNotMatch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3010631328612352
+    m_Key: passwordInvalid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3016495057879040
+    m_Key: usernameExists
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3019843232350208
+    m_Key: invalidUsernameOrPassword
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021945451069440
+    m_Key: networkErrorException
     m_Metadata:
       m_Items: []
   m_Metadata:

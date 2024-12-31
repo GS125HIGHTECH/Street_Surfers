@@ -45,7 +45,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 0.95635384, b: 0.7311321, a: 1}
   m_Intensity: 100
-  m_Range: 10
+  m_Range: 2
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -132,8 +132,6 @@ GameObject:
   - component: {fileID: 3466613539290060386}
   - component: {fileID: 8634430355997805572}
   - component: {fileID: 3492686131601883491}
-  - component: {fileID: 8100907452716826381}
-  - component: {fileID: 1229646482715690222}
   m_Layer: 0
   m_Name: streetLamp
   m_TagString: Untagged
@@ -211,50 +209,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &8100907452716826381
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4340829902474375263}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.102446504
-  m_Height: 3.00024
-  m_Direction: 1
-  m_Center: {x: -0.000000029802322, y: 1.50012, z: 0.0041136816}
---- !u!65 &1229646482715690222
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4340829902474375263}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.39769784, y: 0.4731846, z: 0.6460918}
-  m_Center: {x: -0.000000029802322, y: 2.7636476, z: 0.29251873}
 --- !u!1 &5333459473274916307
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,13 +235,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5333459473274916307}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7069369, y: 0.00000018701397, z: 0.000000009468675, w: 0.70727664}
+  m_LocalRotation: {x: 0.5462482, y: 0, z: 0, w: 0.83762336}
   m_LocalPosition: {x: 0, y: 2.5, z: 0.424}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3466613539290060386}
-  m_LocalEulerAnglesHint: {x: 89.972, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 66.22, y: 0, z: 0}
 --- !u!108 &9121279739139948876
 Light:
   m_ObjectHideFlags: 0
@@ -299,10 +253,10 @@ Light:
   serializedVersion: 11
   m_Type: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.7294118, a: 1}
-  m_Intensity: 100
-  m_Range: 12
-  m_SpotAngle: 99
-  m_InnerSpotAngle: 21.80208
+  m_Intensity: 200
+  m_Range: 13
+  m_SpotAngle: 55
+  m_InnerSpotAngle: 50
   m_CookieSize: 10
   m_Shadows:
     m_Type: 2
@@ -341,7 +295,7 @@ Light:
   m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 5
+  m_BounceIntensity: 2
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}

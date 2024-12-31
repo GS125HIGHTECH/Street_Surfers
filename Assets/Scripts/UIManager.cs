@@ -42,8 +42,8 @@ public class UIManager : MonoBehaviour
     {
         if (CarController.Instance != null)
         {
-            long totalDistance = ((long)CarController.Instance.GetTotalDistance());
-            distanceText.text = $"{FormatNumber(totalDistance)} m";
+            long currentDistance = (long)CarController.Instance.GetCurrentDistance();
+            distanceText.text = $"{FormatNumber(currentDistance)} m";
         }
     }
 
