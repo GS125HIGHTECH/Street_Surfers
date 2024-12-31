@@ -203,6 +203,38 @@ MonoBehaviour:
     m_Localized: "Uko\u0144czono misj\u0119:"
     m_Metadata:
       m_Items: []
+  - m_Id: 3007508019167232
+    m_Localized: "Nazwa u\u017Cytkownika nie mo\u017Ce by\u0107 pusta."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3007955605929984
+    m_Localized: "Has\u0142o nie mo\u017Ce by\u0107 puste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3008160837419008
+    m_Localized: "Powt\xF3rz has\u0142o nie mo\u017Ce by\u0107 puste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3008807120945152
+    m_Localized: "Has\u0142a nie s\u0105 jednakowe."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3010631328612352
+    m_Localized: "Has\u0142o nie spe\u0142nia wymaga\u0144."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3016495057879040
+    m_Localized: "Ten u\u017Cytkownik ju\u017C istnieje."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3019843232350208
+    m_Localized: "Niepoprawna nazwa u\u017Cytkownika lub has\u0142o."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021945451069440
+    m_Localized: "B\u0142\u0105d po\u0142\u0105czenia z sieci\u0105."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
