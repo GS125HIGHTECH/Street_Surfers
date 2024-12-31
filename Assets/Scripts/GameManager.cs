@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
     private long coinCount = 0;
+    private long coinsEarned = 0;
+    private long coinsSpent = 0;
     private long currentCoinCount = 0;
     private int currentSpeedBoostCount = 0;
     private double bestScore = 0;
@@ -81,29 +83,32 @@ public class GameManager : MonoBehaviour
             gameOverCanvasGroup.alpha = 0f;
             gameOverPanel.SetActive(false);
         }
-
-        nextSpawnPosition = new Vector3(0, 0, -10);
-        currentCoinCount = 0;
-        currentSpeedBoostCount = 0;
     }
 
     public async void AddCoin()
     {
-        coinCount++;
+        coinsEarned++;
         currentCoinCount++;
 
-        await SaveData("coins", coinCount);
+        coinCount = coinsEarned - coinsSpent;
+
+        await SaveData("coinsEarned", coinsEarned);
     }
 
     public void AddSpeedBoost() => currentSpeedBoostCount++;
 
     public async Task<long> GetCoinCountAsync()
     {
-        coinCount = await LoadData("coins", coinCount, true);
+        coinsEarned = await LoadData("coinsEarned", 0L, true);
+        coinsSpent = await LoadData("coinsSpent", 0L, true);
+        coinCount = coinsEarned - coinsSpent;
+
         return coinCount;
     }
 
     public long GetCoinCount() => coinCount;
+
+    public long GetCoinSpent() => coinsSpent;
 
     public float GetCurrentCoinCount() => currentCoinCount;
 
@@ -138,13 +143,16 @@ public class GameManager : MonoBehaviour
 
     private async Task InitializeCloudSave()
     {
-        coinCount = await LoadData("coins", coinCount, true);
-        bestScore = await LoadData("bestScore", bestScore, true);
+        currentCoinCount = 0;
+        currentSpeedBoostCount = 0;
+        lastBoostSpawnDistance = 0;
 
-        await SaveBestScoreAsync(bestScore);
-        await MissionManager.Instance.LoadMissionProgress();
+        bestScore = await LoadData("bestScore", 0.0, true);
+
+        await GetCoinCountAsync();
         await UpgradeManager.Instance.LoadUpgradeData();
-        await UpgradeManager.Instance.SaveUpgradeData();
+        await MissionManager.Instance.LoadMissionProgress();
+        await SaveBestScoreAsync(bestScore);
     }
 
     private void StartSpawning()
@@ -153,13 +161,13 @@ public class GameManager : MonoBehaviour
         menuPanel.SetActive(false);
         startPanel.SetActive(true);
         coinsPanel.SetActive(false);
+
         if(!isGamePlayable)
         {
             SpawnCar();
+            CarController.Instance.PauseController();
         }
-      
-        CarController.Instance.PauseController();
-        if (isGamePlayable)
+        else if (isGamePlayable)
         {
             currentCar.SetActive(isGamePlayable);
             startPanel.SetActive(false);
@@ -371,7 +379,7 @@ public class GameManager : MonoBehaviour
             roadBlocker.AddComponent<RoadBlocker>();
         }
 
-        double currentDistance = CarController.Instance.GetCurrentDistance();
+        double currentDistance = CarController.Instance.GetBaseDistance();
         double distanceSinceLastBoost = currentDistance - lastBoostSpawnDistance;
 
         int remainingSpaces = availableLines.Count - blockersToSpawn;
@@ -502,10 +510,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void RestartGameOver()
+    public async void RestartGameOver()
     {
         RestartGame();
         StartSpawning();
+        await InitializeCloudSave();
     }
 
     private void RestartGame()
@@ -618,8 +627,7 @@ public class GameManager : MonoBehaviour
 
     private async Task SaveBestScoreAsync(double currentDistance)
     {
-        double bestScoreData = await LoadData("bestScore", bestScore);
-
+        double bestScoreData = await LoadData("bestScore", 0.0);
         double roundedDistance = Math.Floor(currentDistance * 100) / 100;
 
         if (roundedDistance > bestScoreData)
@@ -685,11 +693,27 @@ public class GameManager : MonoBehaviour
                         return cloudValue;
                     }
                 }
+                else
+                {
+                    PlayerPrefs.SetString(prefsKey, cloudValue.ToString());
+                    PlayerPrefs.Save();
+                }
 
                 return cloudValue;
             }
+            else if (PlayerPrefs.HasKey(prefsKey))
+            {
+                var prefsValue = LoadFromPlayerPrefs<T>(prefsKey);
+                await CloudSaveService.Instance.Data.Player.SaveAsync(new Dictionary<string, object> { { key, prefsValue } });
+                return prefsValue;
+            }
             else
             {
+                await CloudSaveService.Instance.Data.Player.SaveAsync(new Dictionary<string, object> { { key, defaultValue } });
+
+                PlayerPrefs.SetString(prefsKey, defaultValue.ToString());
+                PlayerPrefs.Save();
+               
                 return defaultValue;
             }
         }
@@ -701,6 +725,8 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                PlayerPrefs.SetString(prefsKey, defaultValue.ToString());
+                PlayerPrefs.Save();
                 return defaultValue;
             }
         }
