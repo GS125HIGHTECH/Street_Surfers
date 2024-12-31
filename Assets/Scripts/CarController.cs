@@ -53,14 +53,12 @@ public class CarController : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private async void Start()
+    private void Start()
     {
         isMobile = Application.isMobilePlatform;
 
         currentDistance = 0;
         currentLaneChangeCount = 0;
-        await MissionManager.Instance.LoadMissionProgress();
-        await MissionManager.Instance.SaveMissionProgress();
     }
 
     private void Update()
