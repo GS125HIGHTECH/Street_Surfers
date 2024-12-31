@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
     public GameObject roadBlockerPrefab;
     public GameObject mandatoryCarriagewayPrefab;
     public GameObject speedBoostPrefab;
+    public GameObject grassPrefab;
 
     private GameObject currentCar;
 
@@ -46,6 +47,7 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> roadBlockers = new();
     private readonly Queue<GameObject> mandatoryCarriageways = new();
     private readonly Queue<GameObject> speedBoosts = new();
+    private readonly Queue<GameObject> grassSegments = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
     private long coinCount = 0;
@@ -219,6 +221,12 @@ public class GameManager : MonoBehaviour
         GameObject segment = Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
         roadSegments.Enqueue(segment);
 
+        GameObject grassSegment = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(22, -0.1f, 0), Quaternion.identity);
+        grassSegments.Enqueue(grassSegment);
+
+        GameObject grassSegment2 = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(-22, -0.1f, 0), Quaternion.identity);
+        grassSegments.Enqueue(grassSegment2);
+
         if (nextSpawnPosition.z % 3 == 0 && nextSpawnPosition.z > 10 && nextSpawnPosition.z > mainCamera.transform.position.z)
         {
             SpawnCoins(nextSpawnPosition);
@@ -237,6 +245,17 @@ public class GameManager : MonoBehaviour
             if (oldestSegment.transform.position.z < mainCamera.transform.position.z - 10)
             {
                 roadSegments.Dequeue();
+                Destroy(oldestSegment);
+            }
+        }
+
+        if (grassSegments.Count > 0)
+        {
+            GameObject oldestSegment = grassSegments.Peek();
+
+            if (oldestSegment.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                grassSegments.Dequeue();
                 Destroy(oldestSegment);
             }
         }
@@ -524,6 +543,12 @@ public class GameManager : MonoBehaviour
             Destroy(segment);
         }
         roadSegments.Clear();
+
+        foreach (var segment in grassSegments)
+        {
+            Destroy(segment);
+        }
+        grassSegments.Clear();
 
         foreach (var coin in coins)
         {
