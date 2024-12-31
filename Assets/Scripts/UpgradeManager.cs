@@ -22,10 +22,11 @@ public class UpgradeManager : MonoBehaviour
     private int boostDurationLevel = 0;
 
     private long currentCoinCount = 0;
+    private long coinsSpent = 0;
 
     private const int maxLevel = 6;
-    private readonly int[] handlingUpgradeCosts = { 500, 2000, 5000, 10000, 20000, 50000 };
-    private readonly int[] boostUpgradeCosts = { 500, 2000, 5000, 10000, 20000, 50000 };
+    private readonly int[] handlingUpgradeCosts = { 100, 200, 500, 1000, 2000, 5000 };
+    private readonly int[] boostUpgradeCosts = { 100, 200, 500, 1000, 2000, 5000 };
 
     private void Awake()
     {
@@ -60,11 +61,11 @@ public class UpgradeManager : MonoBehaviour
         if (handlingLevel < maxLevel)
         {
             long cost = handlingUpgradeCosts[handlingLevel];
-            currentCoinCount = GameManager.Instance.GetCoinCount();
+            currentCoinCount = await GameManager.Instance.GetCoinCountAsync();
 
             if (currentCoinCount >= cost)
             {
-                currentCoinCount -= cost;
+                coinsSpent += cost;
                 handlingLevel++;
                 CarController.Instance.UpdateHandling(1f - (handlingLevel * 0.1f));
                 await SaveUpgradeData();
@@ -78,11 +79,11 @@ public class UpgradeManager : MonoBehaviour
         if (boostDurationLevel < maxLevel)
         {
             long cost = boostUpgradeCosts[boostDurationLevel];
-            currentCoinCount = GameManager.Instance.GetCoinCount();
+            currentCoinCount = await GameManager.Instance.GetCoinCountAsync();
 
             if (currentCoinCount >= cost)
             {
-                currentCoinCount -= cost;
+                coinsSpent += cost;
                 boostDurationLevel++;
                 CarController.Instance.UpdateBoostDuration(2f + (boostDurationLevel * 2f));
                 await SaveUpgradeData();
@@ -153,6 +154,7 @@ public class UpgradeManager : MonoBehaviour
             GameManager.Instance.upgradePanel.SetActive(true);
 
             await LoadUpgradeData();
+            await SaveUpgradeData();
         }
     }
 
@@ -164,10 +166,11 @@ public class UpgradeManager : MonoBehaviour
 
     public async Task LoadUpgradeData()
     {
-        currentCoinCount = await GameManager.Instance.LoadData<long>("coins", 0);
+        currentCoinCount = GameManager.Instance.GetCoinCount();
+        coinsSpent = GameManager.Instance.GetCoinSpent();
 
-        handlingLevel = await GameManager.Instance.LoadData<int>("handlingLevel", 0);
-        boostDurationLevel = await GameManager.Instance.LoadData<int>("boostDurationLevel", 0);
+        handlingLevel = await GameManager.Instance.LoadData("handlingLevel", 0, true);
+        boostDurationLevel = await GameManager.Instance.LoadData("boostDurationLevel", 0, true);
 
         CarController.Instance.UpdateHandling(1f - (handlingLevel * 0.1f));
         CarController.Instance.UpdateBoostDuration(2f + (boostDurationLevel * 2f));
@@ -175,9 +178,9 @@ public class UpgradeManager : MonoBehaviour
         UpdateUpgradeUI();
     }
 
-    private async Task SaveUpgradeData()
+    public async Task SaveUpgradeData()
     {
-        await GameManager.Instance.SaveData("coins", currentCoinCount);
+        await GameManager.Instance.SaveData("coinsSpent", coinsSpent);
         await GameManager.Instance.SaveData("handlingLevel", handlingLevel);
         await GameManager.Instance.SaveData("boostDurationLevel", boostDurationLevel);
     }

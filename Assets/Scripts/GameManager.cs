@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
     public GameObject roadBlockerPrefab;
     public GameObject mandatoryCarriagewayPrefab;
     public GameObject speedBoostPrefab;
+    public GameObject grassPrefab;
 
     private GameObject currentCar;
 
@@ -46,9 +47,12 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> roadBlockers = new();
     private readonly Queue<GameObject> mandatoryCarriageways = new();
     private readonly Queue<GameObject> speedBoosts = new();
+    private readonly Queue<GameObject> grassSegments = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
     private long coinCount = 0;
+    private long coinsEarned = 0;
+    private long coinsSpent = 0;
     private long currentCoinCount = 0;
     private int currentSpeedBoostCount = 0;
     private double bestScore = 0;
@@ -81,50 +85,38 @@ public class GameManager : MonoBehaviour
             gameOverCanvasGroup.alpha = 0f;
             gameOverPanel.SetActive(false);
         }
-
-        nextSpawnPosition = new Vector3(0, 0, -10);
-        currentCoinCount = 0;
-        currentSpeedBoostCount = 0;
     }
 
     public async void AddCoin()
     {
-        coinCount++;
+        coinsEarned++;
         currentCoinCount++;
 
-        await SaveData("coins", coinCount);
+        coinCount = coinsEarned - coinsSpent;
+
+        await SaveData("coinsEarned", coinsEarned);
     }
 
-    public void AddSpeedBoost()
-    {
-        currentSpeedBoostCount++;
-    }
+    public void AddSpeedBoost() => currentSpeedBoostCount++;
 
     public async Task<long> GetCoinCountAsync()
     {
-        coinCount = await LoadData("coins", coinCount);
+        coinsEarned = await LoadData("coinsEarned", 0L, true);
+        coinsSpent = await LoadData("coinsSpent", 0L, true);
+        coinCount = coinsEarned - coinsSpent;
+
         return coinCount;
     }
 
-    public long GetCoinCount()
-    {
-        return coinCount;
-    }
+    public long GetCoinCount() => coinCount;
 
-    public float GetCurrentCoinCount()
-    {
-        return currentCoinCount;
-    }
+    public long GetCoinSpent() => coinsSpent;
 
-    public int GetCurrentSpeedBoostCount()
-    {
-        return currentSpeedBoostCount;
-    }
+    public float GetCurrentCoinCount() => currentCoinCount;
 
-    public bool IsGamePlayable()
-    {
-        return isGamePlayable;
-    }
+    public int GetCurrentSpeedBoostCount() => currentSpeedBoostCount;
+
+    public bool IsGamePlayable() => isGamePlayable;
 
     private void OnEnable()
     {
@@ -143,15 +135,7 @@ public class GameManager : MonoBehaviour
         isLoggedIn = true;
 
         SettingsManager.Instance.LoadSettings();
-
-        try
-        {
-            await InitializeCloudSave();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error initializing Unity Services: {e.Message}");
-        }
+        await InitializeCloudSave();
     }
 
     private void Update()
@@ -161,24 +145,33 @@ public class GameManager : MonoBehaviour
 
     private async Task InitializeCloudSave()
     {
-        coinCount = await LoadData("coins", coinCount);
-        bestScore = await LoadData("bestScore", bestScore);
+        currentCoinCount = 0;
+        currentSpeedBoostCount = 0;
+        lastBoostSpawnDistance = 0;
+
+        bestScore = await LoadData("bestScore", 0.0, true);
+
+        double roundedDistance = Math.Floor(bestScore * 100) / 100;
+        LeaderboardManager.Instance.AddScoreToLeaderboard(roundedDistance);
+
+        await GetCoinCountAsync();
+        await UpgradeManager.Instance.LoadUpgradeData();
+        await MissionManager.Instance.LoadMissionProgress();
     }
 
-    private async void StartSpawning()
+    private void StartSpawning()
     {
         Time.timeScale = 1;
         menuPanel.SetActive(false);
         startPanel.SetActive(true);
         coinsPanel.SetActive(false);
+
         if(!isGamePlayable)
         {
             SpawnCar();
+            CarController.Instance.PauseController();
         }
-        await UpgradeManager.Instance.LoadUpgradeData();
-        CarController.Instance.PauseController();
-
-        if (isGamePlayable)
+        else if (isGamePlayable)
         {
             currentCar.SetActive(isGamePlayable);
             startPanel.SetActive(false);
@@ -192,8 +185,6 @@ public class GameManager : MonoBehaviour
             {
                 SpawnRoadSegment();
             }
-
-            await MissionManager.Instance.LoadMissionProgress();
 
             InvokeRepeating(nameof(SpawnRoadSegment), 0.5f, spawnInterval);
         }
@@ -232,6 +223,12 @@ public class GameManager : MonoBehaviour
         GameObject segment = Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
         roadSegments.Enqueue(segment);
 
+        GameObject grassSegment = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(22, -0.1f, 0), Quaternion.identity);
+        grassSegments.Enqueue(grassSegment);
+
+        GameObject grassSegment2 = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(-22, -0.1f, 0), Quaternion.identity);
+        grassSegments.Enqueue(grassSegment2);
+
         if (nextSpawnPosition.z % 3 == 0 && nextSpawnPosition.z > 10 && nextSpawnPosition.z > mainCamera.transform.position.z)
         {
             SpawnCoins(nextSpawnPosition);
@@ -250,6 +247,17 @@ public class GameManager : MonoBehaviour
             if (oldestSegment.transform.position.z < mainCamera.transform.position.z - 10)
             {
                 roadSegments.Dequeue();
+                Destroy(oldestSegment);
+            }
+        }
+
+        if (grassSegments.Count > 0)
+        {
+            GameObject oldestSegment = grassSegments.Peek();
+
+            if (oldestSegment.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                grassSegments.Dequeue();
                 Destroy(oldestSegment);
             }
         }
@@ -392,8 +400,8 @@ public class GameManager : MonoBehaviour
             roadBlocker.AddComponent<RoadBlocker>();
         }
 
-        double totalDistance = CarController.Instance.GetTotalDistance();
-        double distanceSinceLastBoost = totalDistance - lastBoostSpawnDistance;
+        double currentDistance = CarController.Instance.GetBaseDistance();
+        double distanceSinceLastBoost = currentDistance - lastBoostSpawnDistance;
 
         int remainingSpaces = availableLines.Count - blockersToSpawn;
 
@@ -403,7 +411,7 @@ public class GameManager : MonoBehaviour
             GameObject speedBoost = Instantiate(speedBoostPrefab, speedBoostPosition, Quaternion.identity);
             speedBoosts.Enqueue(speedBoost);
 
-            lastBoostSpawnDistance = totalDistance;
+            lastBoostSpawnDistance = currentDistance;
         }
 
         if (IsSpawnedInRightmostLines(spawnedBlockerIndices, linePositions.Length))
@@ -500,27 +508,41 @@ public class GameManager : MonoBehaviour
     public void ResumeGame()
     {
         HideMenu();
+        AudioManager.Instance.ResumeAllSounds();
         Time.timeScale = 1;
         AudioManager.Instance.PlayEngineSound();
     }
 
     public void StartGame()
     {
+        StartCoroutine(StartGameWithDelay());
+    }
+
+    private IEnumerator StartGameWithDelay()
+    {
+        yield return new WaitForSeconds(0.5f);
+
         isGamePlayable = true;
         StartSpawning();
     }
 
     public void PauseGame()
     {
-        ShowMenu();
-        Time.timeScale = 0;
-        AudioManager.Instance.StopEngineSound();
+        if(!CarController.Instance.isBoostActive && !CarController.Instance.isChangingLane)
+        {
+            AudioManager.Instance.PlayClickSound();
+            ShowMenu();
+            AudioManager.Instance.PauseAllSounds();
+            Time.timeScale = 0;
+            AudioManager.Instance.StopEngineSound();
+        }
     }
 
-    public void RestartGameOver()
+    public async void RestartGameOver()
     {
         RestartGame();
         StartSpawning();
+        await InitializeCloudSave();
     }
 
     private void RestartGame()
@@ -530,6 +552,12 @@ public class GameManager : MonoBehaviour
             Destroy(segment);
         }
         roadSegments.Clear();
+
+        foreach (var segment in grassSegments)
+        {
+            Destroy(segment);
+        }
+        grassSegments.Clear();
 
         foreach (var coin in coins)
         {
@@ -599,18 +627,14 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         RestartGame();
-
-        AudioManager.Instance.StopEngineSound();
-
         AuthenticationService.Instance.SignOut();
-
         AuthenticationManager.Instance.ShowLoginPanel();
     }
 
     public async void GameOver()
     {
+        AudioManager.Instance.PauseAllSounds();
         Time.timeScale = 0;
-        AudioManager.Instance.StopSpeedBoostSound();
 
         if (gameOverPanel != null)
         {
@@ -618,7 +642,7 @@ public class GameManager : MonoBehaviour
             StartCoroutine(FadeIn(gameOverCanvasGroup));
         }
 
-        await SaveBestScoreAsync(CarController.Instance.GetTotalDistance());
+        await SaveBestScoreAsync(CarController.Instance.GetCurrentDistance());
 
         coinsPanel.SetActive(false);
     }
@@ -637,16 +661,17 @@ public class GameManager : MonoBehaviour
 
     private async Task SaveBestScoreAsync(double currentDistance)
     {
-        double bestScoreData = await LoadData("bestScore", bestScore);
+        double bestScoreData = await LoadData("bestScore", 0.0);
+        double roundedDistance = Math.Floor(currentDistance * 100) / 100;
 
-        if (currentDistance > bestScoreData)
+        if (roundedDistance > bestScoreData)
         {
-            double roundedDistance = Math.Floor(currentDistance * 100) / 100;
-
             await SaveData("bestScore", roundedDistance);
-            LeaderboardManager.Instance.AddScoreToLeaderboard(roundedDistance);
+        }
 
-            bestScore = roundedDistance;
+        if(Application.internetReachability != NetworkReachability.NotReachable)
+        {
+            LeaderboardManager.Instance.AddScoreToLeaderboard(roundedDistance);
         }
     }
 
@@ -654,8 +679,13 @@ public class GameManager : MonoBehaviour
     {
         try
         {
-            var data = new Dictionary<string, object> { { key, value } };
-            await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+            string username = AuthenticationManager.Instance.GetUsername();
+            SaveToPlayerPrefs(key + username, value);
+            if (Application.internetReachability != NetworkReachability.NotReachable)
+            {
+                var data = new Dictionary<string, object> { { key, value } };
+                await CloudSaveService.Instance.Data.Player.SaveAsync(data);
+            }
         }
         catch (Exception e)
         {
@@ -663,29 +693,96 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public async Task<T> LoadData<T>(string key, T defaultValue)
+    private void SaveToPlayerPrefs<T>(string key, T value)
     {
-        try
+        PlayerPrefs.SetString(key, value.ToString());
+        PlayerPrefs.Save();
+    }
+
+    public async Task<T> LoadData<T>(string key, T defaultValue, bool overwrite = false)
+    {
+        string username = AuthenticationManager.Instance.GetUsername();
+        string prefsKey = key + username;
+
+        if (Application.internetReachability != NetworkReachability.NotReachable)
         {
             var playerData = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key });
 
             if (playerData.TryGetValue(key, out var dataValue))
             {
-                return dataValue.Value.GetAs<T>();
+                var cloudValue = dataValue.Value.GetAs<T>();
+
+                if (overwrite && PlayerPrefs.HasKey(prefsKey))
+                {
+                    var prefsValue = LoadFromPlayerPrefs<T>(prefsKey);
+                    if (Comparer<T>.Default.Compare(prefsValue, cloudValue) > 0)
+                    {
+                        await CloudSaveService.Instance.Data.Player.SaveAsync(new Dictionary<string, object> { { key, prefsValue } });
+                        return prefsValue;
+                    }
+                    else if(Comparer<T>.Default.Compare(prefsValue, cloudValue) < 0)
+                    {
+                        PlayerPrefs.SetString(prefsKey, cloudValue.ToString());
+                        PlayerPrefs.Save();
+                        return cloudValue;
+                    }
+                }
+                else
+                {
+                    PlayerPrefs.SetString(prefsKey, cloudValue.ToString());
+                    PlayerPrefs.Save();
+                }
+
+                return cloudValue;
+            }
+            else if (PlayerPrefs.HasKey(prefsKey))
+            {
+                var prefsValue = LoadFromPlayerPrefs<T>(prefsKey);
+                await CloudSaveService.Instance.Data.Player.SaveAsync(new Dictionary<string, object> { { key, prefsValue } });
+                return prefsValue;
             }
             else
             {
-                Debug.Log($"The '{key}' data could not be found. Initializing with default value.");
+                await CloudSaveService.Instance.Data.Player.SaveAsync(new Dictionary<string, object> { { key, defaultValue } });
 
-                var defaultData = new Dictionary<string, object> { { key, defaultValue } };
-                await CloudSaveService.Instance.Data.Player.SaveAsync(defaultData);
+                PlayerPrefs.SetString(prefsKey, defaultValue.ToString());
+                PlayerPrefs.Save();
+               
                 return defaultValue;
             }
         }
-        catch (Exception e)
+        else
         {
-            Debug.LogError($"Error loading cloud save data for key '{key}': {e.Message}");
-            return defaultValue;
+            if (PlayerPrefs.HasKey(prefsKey))
+            {
+                return LoadFromPlayerPrefs<T>(prefsKey);
+            }
+            else
+            {
+                PlayerPrefs.SetString(prefsKey, defaultValue.ToString());
+                PlayerPrefs.Save();
+                return defaultValue;
+            }
+        }
+    }
+
+    private T LoadFromPlayerPrefs<T>(string key)
+    {
+        var jsonValue = PlayerPrefs.GetString(key);
+
+        if (string.IsNullOrEmpty(jsonValue))
+        {
+            return default;
+        }
+
+        try
+        {
+            return (T)Convert.ChangeType(jsonValue, typeof(T));
+        }
+        catch (InvalidCastException)
+        {
+            Debug.LogError($"Cannot convert {jsonValue} to type {typeof(T)}");
+            return default;
         }
     }
 }
