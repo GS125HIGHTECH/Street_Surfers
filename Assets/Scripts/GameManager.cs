@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
     public GameObject mandatoryCarriagewayPrefab;
     public GameObject speedBoostPrefab;
     public GameObject grassPrefab;
+    public GameObject simplePolyBillboardPrefab;
 
     private GameObject currentCar;
 
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> mandatoryCarriageways = new();
     private readonly Queue<GameObject> speedBoosts = new();
     private readonly Queue<GameObject> grassSegments = new();
+    private readonly Queue<GameObject> simplePolyBillboards = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
     private long coinCount = 0;
@@ -235,6 +237,11 @@ public class GameManager : MonoBehaviour
             SpawnStreetLamps(nextSpawnPosition);
         }
 
+        if (nextSpawnPosition.z % 17 == 0 && nextSpawnPosition.z > 10 && nextSpawnPosition.z > mainCamera.transform.position.z)
+        {
+            SpawnSimplePolyBillboards(nextSpawnPosition);
+        }
+
         nextSpawnPosition += new Vector3(0, 0, segmentLength);
     }
 
@@ -321,6 +328,17 @@ public class GameManager : MonoBehaviour
                 {
                     Destroy(oldestSpeedBoost);
                 }
+            }
+        }
+
+        if (grassSegments.Count > 0)
+        {
+            GameObject oldestSimplePolyBillboard = simplePolyBillboards.Peek();
+
+            if (oldestSimplePolyBillboard.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                simplePolyBillboards.Dequeue();
+                Destroy(oldestSimplePolyBillboard);
             }
         }
     }
@@ -461,6 +479,15 @@ public class GameManager : MonoBehaviour
         streetLamps.Enqueue(rightLamp);
     }
 
+    private void SpawnSimplePolyBillboards(Vector3 position)
+    {
+        Vector3 billboardPosition = position + new Vector3(16f, 0, 0);
+
+        GameObject billboard = Instantiate(simplePolyBillboardPrefab, billboardPosition, Quaternion.Euler(0, 180f, 0));
+
+        simplePolyBillboards.Enqueue(billboard);
+    }
+
     private void OnApplicationPause(bool pauseStatus)
     {
         if (!pauseStatus && isGamePlayable && !settingsPanel.activeSelf && !creditsPanel.activeSelf)
@@ -594,6 +621,12 @@ public class GameManager : MonoBehaviour
             Destroy(currentCar);
             currentCar = null;
         }
+
+        foreach (var billboard in simplePolyBillboards)
+        {
+            Destroy(billboard);
+        }
+        simplePolyBillboards.Clear();
 
         nextSpawnPosition = new Vector3(0, 0, -10); ;
         mainCamera.transform.position = nextSpawnPosition;
