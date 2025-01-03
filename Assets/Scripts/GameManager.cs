@@ -30,6 +30,8 @@ public class GameManager : MonoBehaviour
     public GameObject speedBoostPrefab;
     public GameObject grassPrefab;
     public GameObject simplePolyBillboardPrefab;
+    public GameObject treePrefab;
+    public GameObject rockPrefab;
 
     private GameObject currentCar;
 
@@ -50,6 +52,8 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> speedBoosts = new();
     private readonly Queue<GameObject> grassSegments = new();
     private readonly Queue<GameObject> simplePolyBillboards = new();
+    private readonly Queue<GameObject> rocks = new();
+    private readonly Queue<GameObject> trees = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
     private long coinCount = 0;
@@ -225,16 +229,17 @@ public class GameManager : MonoBehaviour
         GameObject segment = Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
         roadSegments.Enqueue(segment);
 
-        GameObject grassSegment = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(22, -0.1f, 0), Quaternion.identity);
+        GameObject grassSegment = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(22, -0.01f, 0), Quaternion.identity);
         grassSegments.Enqueue(grassSegment);
 
-        GameObject grassSegment2 = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(-22, -0.1f, 0), Quaternion.identity);
+        GameObject grassSegment2 = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(-22, -0.01f, 0), Quaternion.identity);
         grassSegments.Enqueue(grassSegment2);
 
         if (nextSpawnPosition.z % 3 == 0 && nextSpawnPosition.z > 10 && nextSpawnPosition.z > mainCamera.transform.position.z)
         {
             SpawnCoins(nextSpawnPosition);
             SpawnStreetLamps(nextSpawnPosition);
+            SpawnNature(nextSpawnPosition);
         }
 
         if (nextSpawnPosition.z % 17 == 0 && nextSpawnPosition.z > 10 && nextSpawnPosition.z > mainCamera.transform.position.z)
@@ -331,7 +336,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (grassSegments.Count > 0)
+        if (simplePolyBillboards.Count > 0)
         {
             GameObject oldestSimplePolyBillboard = simplePolyBillboards.Peek();
 
@@ -339,6 +344,28 @@ public class GameManager : MonoBehaviour
             {
                 simplePolyBillboards.Dequeue();
                 Destroy(oldestSimplePolyBillboard);
+            }
+        }
+
+        if (trees.Count > 0)
+        {
+            GameObject oldestTree = trees.Peek();
+
+            if (oldestTree.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                trees.Dequeue();
+                Destroy(oldestTree);
+            }
+        }
+
+        if (rocks.Count > 0)
+        {
+            GameObject oldestRock = rocks.Peek();
+
+            if (oldestRock.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                rocks.Dequeue();
+                Destroy(oldestRock);
             }
         }
     }
@@ -488,6 +515,30 @@ public class GameManager : MonoBehaviour
         simplePolyBillboards.Enqueue(billboard);
     }
 
+    private void SpawnNature(Vector3 position)
+    {
+        Vector3 treePosition = position + new Vector3(18f, 0, 4f + UnityEngine.Random.Range(-2.0f, 2.0f));
+        Vector3 leftTreePosition = position + new Vector3(-18f, 0, 4f + UnityEngine.Random.Range(-2.0f, 2.0f));
+        Vector3 rockPosition = position + new Vector3(20f, 0, UnityEngine.Random.Range(-2.0f, 2.0f));
+        Vector3 leftRockPosition = position + new Vector3(-20f, 0, UnityEngine.Random.Range(-2.0f, 2.0f));
+        Vector3 rockBehindPosition = position + new Vector3(20f, 0, 8f + UnityEngine.Random.Range(-2.0f, 2.0f));
+        Vector3 leftRockBehindPosition = position + new Vector3(-20f, 0, 8f + UnityEngine.Random.Range(-2.0f, 2.0f));
+
+        GameObject tree = Instantiate(treePrefab, treePosition, Quaternion.identity);
+        GameObject leftTree = Instantiate(treePrefab, leftTreePosition, Quaternion.identity);
+        GameObject rock = Instantiate(rockPrefab, rockPosition, Quaternion.identity);
+        GameObject leftRock = Instantiate(rockPrefab, leftRockPosition, Quaternion.identity);
+        GameObject rockBehind = Instantiate(rockPrefab, rockBehindPosition, Quaternion.identity);
+        GameObject leftRockBehind = Instantiate(rockPrefab, leftRockBehindPosition, Quaternion.identity);
+
+        trees.Enqueue(tree);
+        trees.Enqueue(leftTree);
+        rocks.Enqueue(rock);
+        rocks.Enqueue(rockBehind);
+        rocks.Enqueue(leftRock);
+        rocks.Enqueue(leftRockBehind);
+    }
+
     private void OnApplicationPause(bool pauseStatus)
     {
         if (!pauseStatus && isGamePlayable && !settingsPanel.activeSelf && !creditsPanel.activeSelf)
@@ -627,6 +678,18 @@ public class GameManager : MonoBehaviour
             Destroy(billboard);
         }
         simplePolyBillboards.Clear();
+
+        foreach (var tree in trees)
+        {
+            Destroy(tree);
+        }
+        trees.Clear();
+
+        foreach (var rock in rocks)
+        {
+            Destroy(rock);
+        }
+        rocks.Clear();
 
         nextSpawnPosition = new Vector3(0, 0, -10); ;
         mainCamera.transform.position = nextSpawnPosition;
