@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
     public GameObject simplePolyBillboardPrefab;
     public GameObject treePrefab;
     public GameObject rockPrefab;
+    public GameObject[] buildingPrefabs;
 
     private GameObject currentCar;
 
@@ -54,6 +55,7 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> simplePolyBillboards = new();
     private readonly Queue<GameObject> rocks = new();
     private readonly Queue<GameObject> trees = new();
+    private readonly Queue<GameObject> buildings = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
     private long coinCount = 0;
@@ -240,6 +242,7 @@ public class GameManager : MonoBehaviour
             SpawnCoins(nextSpawnPosition);
             SpawnStreetLamps(nextSpawnPosition);
             SpawnNature(nextSpawnPosition);
+            SpawnBuildings(nextSpawnPosition);
         }
 
         if (nextSpawnPosition.z % 17 == 0 && nextSpawnPosition.z > 10 && nextSpawnPosition.z > mainCamera.transform.position.z)
@@ -366,6 +369,17 @@ public class GameManager : MonoBehaviour
             {
                 rocks.Dequeue();
                 Destroy(oldestRock);
+            }
+        }
+
+        if (buildings.Count > 0)
+        {
+            GameObject oldestBuilding = buildings.Peek();
+
+            if (oldestBuilding.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                buildings.Dequeue();
+                Destroy(oldestBuilding);
             }
         }
     }
@@ -539,6 +553,23 @@ public class GameManager : MonoBehaviour
         rocks.Enqueue(leftRockBehind);
     }
 
+    private void SpawnBuildings(Vector3 position)
+    {
+        Vector3 building1Position = position + new Vector3(31f, 0, -25 + UnityEngine.Random.Range(-3.0f, 3.0f));
+        int randomIndex1 = UnityEngine.Random.Range(0, buildingPrefabs.Length);
+        GameObject selectedPrefab1 = buildingPrefabs[randomIndex1];
+
+        Vector3 building2Position = position + new Vector3(-31f, 0, -25 + UnityEngine.Random.Range(-3.0f, 3.0f));
+        int randomIndex2 = UnityEngine.Random.Range(0, buildingPrefabs.Length);
+        GameObject selectedPrefab2 = buildingPrefabs[randomIndex2];
+
+        GameObject building1 = Instantiate(selectedPrefab1, building1Position, Quaternion.Euler(0, 180.0f, 0));
+        GameObject building2 = Instantiate(selectedPrefab2, building2Position, Quaternion.Euler(0, 180.0f, 0));
+
+        buildings.Enqueue(building1);
+        buildings.Enqueue(building2);
+    }
+
     private void OnApplicationPause(bool pauseStatus)
     {
         if (!pauseStatus && isGamePlayable && !settingsPanel.activeSelf && !creditsPanel.activeSelf)
@@ -690,6 +721,12 @@ public class GameManager : MonoBehaviour
             Destroy(rock);
         }
         rocks.Clear();
+
+        foreach (var building in buildings)
+        {
+            Destroy(building);
+        }
+        buildings.Clear();
 
         nextSpawnPosition = new Vector3(0, 0, -10); ;
         mainCamera.transform.position = nextSpawnPosition;
