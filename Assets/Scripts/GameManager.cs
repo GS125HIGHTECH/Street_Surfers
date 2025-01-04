@@ -172,6 +172,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
         menuPanel.SetActive(false);
         startPanel.SetActive(true);
+        touchScreenText.SetActive(true);
         coinsPanel.SetActive(false);
 
         if(!isGamePlayable)
@@ -744,6 +745,8 @@ public class GameManager : MonoBehaviour
         CancelInvoke(nameof(SpawnRoadSegment));
 
         gameOverPanel.SetActive(false);
+        startPanel.SetActive(false);
+        profilePanel.SetActive(false);
 
         currentCoinCount = 0;
         currentSpeedBoostCount = 0;
