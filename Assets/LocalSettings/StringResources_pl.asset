@@ -235,6 +235,38 @@ MonoBehaviour:
     m_Localized: "B\u0142\u0105d po\u0142\u0105czenia z sieci\u0105."
     m_Metadata:
       m_Items: []
+  - m_Id: 4331252587184128
+    m_Localized: Sterowanie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4339397493538816
+    m_Localized: 'Klawiatura:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4339731712458752
+    m_Localized: 'Ekran dotykowy:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4404847795519488
+    m_Localized: Interakcje z interfejsem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4404691566084096
+    m_Localized: "Zmie\u0144 pas na lewy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4404813284786176
+    m_Localized: "Zmie\u0144 pas na prawy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4404895266652160
+    m_Localized: Interakcje z interfejsem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4404929395703808
+    m_Localized: "Zmie\u0144 pas"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
