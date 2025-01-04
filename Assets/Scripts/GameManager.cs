@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public GameObject touchScreenText;
     public GameObject profilePanel;
     public GameObject upgradePanel;
+    public GameObject controlsPanel;
 
     public GameObject roadPrefab;
     public GameObject carPrefab;
@@ -601,6 +602,18 @@ public class GameManager : MonoBehaviour
     {
         menuPanel.SetActive(true);
         creditsPanel.SetActive(false);
+    }
+
+    public void ShowControls()
+    {
+        menuPanel.SetActive(false);
+        controlsPanel.SetActive(true);
+    }
+
+    public void HideControls()
+    {
+        menuPanel.SetActive(true);
+        controlsPanel.SetActive(false);
     }
 
     private void ShowMenu()
