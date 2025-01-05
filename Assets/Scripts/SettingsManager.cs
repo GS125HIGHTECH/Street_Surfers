@@ -121,23 +121,48 @@ public class SettingsManager : MonoBehaviour
         graphicsQualityDropdown.options.Clear();
         languageDropdown.options.Clear();
 
-        string localizedHigh = LocalizationSettings.StringDatabase.GetLocalizedString("highQuality");
-        string localizedMedium = LocalizationSettings.StringDatabase.GetLocalizedString("mediumQuality");
-        string localizedLow = LocalizationSettings.StringDatabase.GetLocalizedString("lowQuality");
+        LocalizationSettings.StringDatabase.GetLocalizedStringAsync("highQuality").Completed += (result) =>
+        {
+            string localizedHigh = result.Result;
+            LocalizationSettings.StringDatabase.GetLocalizedStringAsync("mediumQuality").Completed += (result2) =>
+            {
+                string localizedMedium = result2.Result;
+                LocalizationSettings.StringDatabase.GetLocalizedStringAsync("lowQuality").Completed += (result3) =>
+                {
+                    string localizedLow = result3.Result;
+                    LocalizationSettings.StringDatabase.GetLocalizedStringAsync("polish").Completed += (result4) =>
+                    {
+                        string localizedPolish = result4.Result;
+                        LocalizationSettings.StringDatabase.GetLocalizedStringAsync("english").Completed += (result5) =>
+                        {
+                            string localizedEnglish = result5.Result;
 
-        string localizedPolish = LocalizationSettings.StringDatabase.GetLocalizedString("polish");
-        string localizedEnglish = LocalizationSettings.StringDatabase.GetLocalizedString("english");
+                            var qualityOptions = new List<TMP_Dropdown.OptionData>
+                        {
+                            new(localizedHigh),
+                            new(localizedMedium),
+                            new(localizedLow)
+                        };
 
-        graphicsQualityDropdown.options.Add(new TMP_Dropdown.OptionData(localizedHigh));
-        graphicsQualityDropdown.options.Add(new TMP_Dropdown.OptionData(localizedMedium));
-        graphicsQualityDropdown.options.Add(new TMP_Dropdown.OptionData(localizedLow));
+                            graphicsQualityDropdown.options.AddRange(qualityOptions);
+                            graphicsQualityDropdown.RefreshShownValue();
 
-        graphicsQualityDropdown.RefreshShownValue();
+                            var languageOptions = new List<TMP_Dropdown.OptionData>
+                        {
+                            new(localizedEnglish),
+                            new(localizedPolish)
+                        };
 
-        languageDropdown.options.Add(new TMP_Dropdown.OptionData(localizedEnglish));
-        languageDropdown.options.Add(new TMP_Dropdown.OptionData(localizedPolish));
+                            languageDropdown.options.AddRange(languageOptions);
+                            languageDropdown.RefreshShownValue();
 
-        languageDropdown.RefreshShownValue();
+                            graphicsQualityDropdown.captionText.text = graphicsQualityDropdown.options[graphicsQualityDropdown.value].text;
+                            languageDropdown.captionText.text = languageDropdown.options[languageDropdown.value].text;
+                        };
+                    };
+                };
+            };
+        };
     }
 
     private void OnLanguageChanged(Locale newLocale)

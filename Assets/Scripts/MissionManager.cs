@@ -82,15 +82,27 @@ public class MissionManager : MonoBehaviour
     {
         activeMissions.Clear();
 
-        string localizedCollectCoins = LocalizationSettings.StringDatabase.GetLocalizedString("collectCoins");
-        string localizedDriveDistance = LocalizationSettings.StringDatabase.GetLocalizedString("driveDistance");
-        string localizedCollectSpeedBoosts = LocalizationSettings.StringDatabase.GetLocalizedString("collectSpeedBoosts");
-        string localizedChangeLanes = LocalizationSettings.StringDatabase.GetLocalizedString("changeLanes");
+        LocalizationSettings.StringDatabase.GetLocalizedStringAsync("collectCoins").Completed += (result1) =>
+        {
+            string localizedCollectCoins = result1.Result;
+            LocalizationSettings.StringDatabase.GetLocalizedStringAsync("driveDistance").Completed += (result2) =>
+            {
+                string localizedDriveDistance = result2.Result;
+                LocalizationSettings.StringDatabase.GetLocalizedStringAsync("collectSpeedBoosts").Completed += (result3) =>
+                {
+                    string localizedCollectSpeedBoosts = result3.Result;
+                    LocalizationSettings.StringDatabase.GetLocalizedStringAsync("changeLanes").Completed += (result4) =>
+                    {
+                        string localizedChangeLanes = result4.Result;
 
-        activeMissions.Add(new Mission("Collect Coins", localizedCollectCoins, new[] { 20, 50, 100, 200, 300, 500, 800, 1000, 1200, 1500 }, MissionType.Coins));
-        activeMissions.Add(new Mission("Drive Distance", localizedDriveDistance, new[] { 500, 1000, 2000, 5000, 10000, 20000, 50000, 75000, 100000, 150000 }, MissionType.Distance));
-        activeMissions.Add(new Mission("Collect Speed Boosts", localizedCollectSpeedBoosts, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, MissionType.SpeedBoost));
-        activeMissions.Add(new Mission("Change Lanes", localizedChangeLanes, new[] { 20, 40, 80, 100, 150, 200, 300, 400, 500, 1000 }, MissionType.LaneChange));
+                        activeMissions.Add(new Mission("Collect Coins", localizedCollectCoins, new[] { 20, 50, 100, 200, 300, 500, 800, 1000, 1200, 1500 }, MissionType.Coins));
+                        activeMissions.Add(new Mission("Drive Distance", localizedDriveDistance, new[] { 500, 1000, 2000, 5000, 10000, 20000, 50000, 75000, 100000, 150000 }, MissionType.Distance));
+                        activeMissions.Add(new Mission("Collect Speed Boosts", localizedCollectSpeedBoosts, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, MissionType.SpeedBoost));
+                        activeMissions.Add(new Mission("Change Lanes", localizedChangeLanes, new[] { 20, 40, 80, 100, 150, 200, 300, 400, 500, 1000 }, MissionType.LaneChange));
+                    };
+                };
+            };
+        };
     }
 
     private void UpdateMissionDisplayNames()
@@ -126,6 +138,8 @@ public class MissionManager : MonoBehaviour
         }
 
         missionDropdown.AddOptions(options);
+
+        missionDropdown.RefreshShownValue();
     }
 
     private void Update()
@@ -144,20 +158,23 @@ public class MissionManager : MonoBehaviour
         }
     }
 
-    public async void CompleteMission(Mission mission)
+    public void CompleteMission(Mission mission)
     {
         if (mission.IsCompleted())
         {
-            string localizedMissionCompleted = LocalizationSettings.StringDatabase.GetLocalizedString("missionCompleted");
-            mission.HasReceivedNotification = true;
+            LocalizationSettings.StringDatabase.GetLocalizedStringAsync("missionCompleted").Completed += (result) =>
+            {
+                string localizedMissionCompleted = result.Result;
 
-            string message = $"{localizedMissionCompleted} {mission.DisplayedName}";
-            ShowNotification(message);
+                mission.HasReceivedNotification = true;
+                string message = $"{localizedMissionCompleted} {mission.DisplayedName}";
+                ShowNotification(message);
 
-            mission.AdvanceToNextGoal();
-            CarController.Instance.IncreaseDistanceBoost(additionalBoost);
+                mission.AdvanceToNextGoal();
+                CarController.Instance.IncreaseDistanceBoost(additionalBoost);
 
-            await SaveMissionProgress();
+                SaveMissionProgress();
+            };
         }
     }
 
