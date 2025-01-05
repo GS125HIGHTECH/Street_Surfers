@@ -628,6 +628,14 @@ public class GameManager : MonoBehaviour
         coinsPanel.SetActive(true);
     }
 
+    public void ExitGame()
+    {
+#if UNITY_STANDALONE_WIN || UNITY_ANDROID
+        Application.Quit();
+        System.Diagnostics.Process.GetCurrentProcess().Kill();
+#endif
+    }
+
     public void ResumeGame()
     {
         HideMenu();
