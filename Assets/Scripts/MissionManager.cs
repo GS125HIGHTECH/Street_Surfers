@@ -126,6 +126,8 @@ public class MissionManager : MonoBehaviour
         }
 
         missionDropdown.AddOptions(options);
+
+        missionDropdown.RefreshShownValue();
     }
 
     private void Update()
