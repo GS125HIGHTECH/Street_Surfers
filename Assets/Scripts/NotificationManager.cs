@@ -1,6 +1,8 @@
+#if UNITY_ANDROID
 using Unity.Notifications.Android;
-using UnityEngine;
 using UnityEngine.Android;
+#endif
+using UnityEngine;
 
 public class NotificationManager : MonoBehaviour
 {
@@ -18,7 +20,7 @@ public class NotificationManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
+#if UNITY_ANDROID
     private void Start()
     {
         RequestAuthorization();
@@ -60,4 +62,6 @@ public class NotificationManager : MonoBehaviour
 
         AndroidNotificationCenter.SendNotification(notification, "street_surfers_channel");
     }
+#endif
 }
+
