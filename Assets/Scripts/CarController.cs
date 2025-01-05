@@ -100,7 +100,12 @@ public class CarController : MonoBehaviour
     {
         float swipeThreshold = 50f;
 
-        if (!GameManager.Instance.menuPanel.activeSelf && !GameManager.Instance.settingsPanel.activeSelf)
+        if (
+            !GameManager.Instance.menuPanel.activeSelf && 
+            !GameManager.Instance.settingsPanel.activeSelf && 
+            !GameManager.Instance.creditsPanel.activeSelf && 
+            !GameManager.Instance.controlsPanel.activeSelf
+            )
         {
             if (Touchscreen.current.primaryTouch.press.isPressed)
             {
@@ -123,7 +128,12 @@ public class CarController : MonoBehaviour
 
     private void HandleKeyboardInput()
     {
-        if (!GameManager.Instance.menuPanel.activeSelf && !GameManager.Instance.settingsPanel.activeSelf)
+        if (
+            !GameManager.Instance.menuPanel.activeSelf && 
+            !GameManager.Instance.settingsPanel.activeSelf && 
+            !GameManager.Instance.creditsPanel.activeSelf && 
+            !GameManager.Instance.controlsPanel.activeSelf
+            )
         {
             if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
             {
