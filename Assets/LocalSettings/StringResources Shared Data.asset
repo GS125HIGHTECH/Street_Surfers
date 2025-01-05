@@ -261,6 +261,10 @@ MonoBehaviour:
     m_Key: swipeGestureControl
     m_Metadata:
       m_Items: []
+  - m_Id: 4696203751342080
+    m_Key: exit
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

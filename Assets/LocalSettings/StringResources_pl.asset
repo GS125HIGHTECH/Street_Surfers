@@ -267,6 +267,10 @@ MonoBehaviour:
     m_Localized: "Zmie\u0144 pas"
     m_Metadata:
       m_Items: []
+  - m_Id: 4696203751342080
+    m_Localized: "Wyjd\u017A"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
