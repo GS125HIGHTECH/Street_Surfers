@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
     public GameObject simplePolyBillboardPrefab;
     public GameObject treePrefab;
     public GameObject rockPrefab;
+    public GameObject iceObstaclePrefab;
     public GameObject[] buildingPrefabs;
 
     private GameObject currentCar;
@@ -56,6 +57,7 @@ public class GameManager : MonoBehaviour
     private readonly Queue<GameObject> simplePolyBillboards = new();
     private readonly Queue<GameObject> rocks = new();
     private readonly Queue<GameObject> trees = new();
+    private readonly Queue<GameObject> iceObstacles = new();
     private readonly Queue<GameObject> buildings = new();
     private Vector3 nextSpawnPosition;
     private Camera mainCamera;
@@ -374,6 +376,20 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if (iceObstacles.Count > 0)
+        {
+            GameObject oldestIceObstacle = iceObstacles.Peek();
+
+            if (oldestIceObstacle == null || oldestIceObstacle.transform.position.z < mainCamera.transform.position.z - 10)
+            {
+                iceObstacles.Dequeue();
+                if (oldestIceObstacle != null)
+                {
+                    Destroy(oldestIceObstacle);
+                }
+            }
+        }
+
         if (buildings.Count > 0)
         {
             GameObject oldestBuilding = buildings.Peek();
@@ -473,6 +489,12 @@ public class GameManager : MonoBehaviour
             speedBoosts.Enqueue(speedBoost);
 
             lastBoostSpawnDistance = currentDistance;
+        }
+        else if (remainingSpaces == 1)
+        {
+            Vector3 iceObstaclePosition = startPosition + new Vector3(linePositions[availableLines[availableLines.Count - 1]], 0.01f, 0);
+            GameObject iceObstacle = Instantiate(iceObstaclePrefab, iceObstaclePosition, Quaternion.identity);
+            iceObstacles.Enqueue(iceObstacle);
         }
 
         if (IsSpawnedInRightmostLines(spawnedBlockerIndices, linePositions.Length))
@@ -744,6 +766,12 @@ public class GameManager : MonoBehaviour
         }
         rocks.Clear();
 
+        foreach (var iceObstacle in iceObstacles)
+        {
+            Destroy(iceObstacle);
+        }
+        iceObstacles.Clear();
+
         foreach (var building in buildings)
         {
             Destroy(building);
@@ -756,6 +784,7 @@ public class GameManager : MonoBehaviour
 
         CarController.Instance.ResetCurrentDistance();
         CarController.Instance.ResetCurrentLaneChangeCount();
+        CarController.Instance.ResetIsSliding();
 
         if (CarController.Instance != null)
         {
