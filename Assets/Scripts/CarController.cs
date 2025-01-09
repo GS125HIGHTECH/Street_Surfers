@@ -37,6 +37,9 @@ public class CarController : MonoBehaviour
     private float distanceBoost = 0f;
     [SerializeField]
     private float baseDistance = 0f;
+    [SerializeField]
+    private bool isSliding = false;
+    private readonly float slidingTime = 0.8f;
 
     private void Awake()
     {
@@ -104,7 +107,8 @@ public class CarController : MonoBehaviour
             !GameManager.Instance.menuPanel.activeSelf && 
             !GameManager.Instance.settingsPanel.activeSelf && 
             !GameManager.Instance.creditsPanel.activeSelf && 
-            !GameManager.Instance.controlsPanel.activeSelf
+            !GameManager.Instance.controlsPanel.activeSelf &&
+            !isSliding
             )
         {
             if (Touchscreen.current.primaryTouch.press.isPressed)
@@ -132,7 +136,8 @@ public class CarController : MonoBehaviour
             !GameManager.Instance.menuPanel.activeSelf && 
             !GameManager.Instance.settingsPanel.activeSelf && 
             !GameManager.Instance.creditsPanel.activeSelf && 
-            !GameManager.Instance.controlsPanel.activeSelf
+            !GameManager.Instance.controlsPanel.activeSelf &&
+            !isSliding
             )
         {
             if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
@@ -250,6 +255,21 @@ public class CarController : MonoBehaviour
         isBoostActive = false;
     }
 
+    public void SetSliding()
+    {
+        if (!isSliding)
+        {
+            StartCoroutine(SlidingCoroutine());
+        }
+    }
+
+    private IEnumerator SlidingCoroutine()
+    {
+        isSliding = true;
+        yield return new WaitForSeconds(slidingTime);
+        isSliding = false;
+    }
+
     public float GetCurrentDistance() => currentDistance;
 
     public float GetBaseDistance() => baseDistance;
@@ -265,6 +285,8 @@ public class CarController : MonoBehaviour
     public void SetDistanceBoost(float newBoost) => distanceBoost = newBoost;
 
     public void IncreaseDistanceBoost(float boost) => distanceBoost += boost;
+
+    public void ResetIsSliding() => isSliding = false;
 
     public void ResumeController()
     {
