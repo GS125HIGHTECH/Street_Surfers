@@ -266,6 +266,7 @@ public class CarController : MonoBehaviour
     private IEnumerator SlidingCoroutine()
     {
         isSliding = true;
+        IceObstacleManager.Instance.StartIceObstacleEffect(slidingTime);
         yield return new WaitForSeconds(slidingTime);
         isSliding = false;
     }
