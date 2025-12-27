@@ -235,10 +235,10 @@ public class GameManager : MonoBehaviour
         GameObject segment = Instantiate(roadPrefab, nextSpawnPosition, Quaternion.identity);
         roadSegments.Enqueue(segment);
 
-        GameObject grassSegment = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(22, -0.01f, 0), Quaternion.identity);
+        GameObject grassSegment = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(82, -0.01f, 0), Quaternion.identity);
         grassSegments.Enqueue(grassSegment);
 
-        GameObject grassSegment2 = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(-22, -0.01f, 0), Quaternion.identity);
+        GameObject grassSegment2 = Instantiate(grassPrefab, nextSpawnPosition + new Vector3(-82, -0.01f, 0), Quaternion.identity);
         grassSegments.Enqueue(grassSegment2);
 
         if (nextSpawnPosition.z % 3 == 0 && nextSpawnPosition.z > 10 && nextSpawnPosition.z > mainCamera.transform.position.z)
