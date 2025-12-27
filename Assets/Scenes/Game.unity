@@ -2917,7 +2917,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25, y: -75}
+  m_AnchoredPosition: {x: 25, y: -74.99988}
   m_SizeDelta: {x: -50, y: -150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &144324487
@@ -7350,7 +7350,6 @@ MonoBehaviour:
   Receiver: {fileID: 464581911}
   HeadMovementCommand: 0
   JawClenchState: 0
-  RelaxationIndex: 0
 --- !u!1 &469864116
 GameObject:
   m_ObjectHideFlags: 0
@@ -20569,7 +20568,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25, y: -75}
+  m_AnchoredPosition: {x: 25, y: -74.99988}
   m_SizeDelta: {x: -50, y: -150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1481413854
