@@ -78,6 +78,19 @@ public class MissionManager : MonoBehaviour
         }
     }
 
+    public void TriggerDropdownBCI()
+    {
+        if (missionDropdown != null)
+        {
+            if (!missionDropdown.IsExpanded)
+            {
+                missionDropdown.Show();
+
+                HandleDropdownClick();
+            }
+        }
+    }
+
     private void GenerateMissions()
     {
         activeMissions.Clear();
