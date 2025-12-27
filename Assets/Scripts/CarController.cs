@@ -151,6 +151,17 @@ public class CarController : MonoBehaviour
         }
     }
 
+    public void HandleExternalLaneChange(int direction)
+    {
+        if (!isGamePlayable || isSliding || isChangingLane)
+            return;
+
+        if (direction == 1 || direction == -1)
+        {
+            ChangeLane(direction);
+        }
+    }
+
     private void ChangeLane(int direction)
     {
         int newLaneIndex = currentLaneIndex + direction;
