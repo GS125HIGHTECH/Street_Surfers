@@ -4,29 +4,77 @@ using UnityEngine.InputSystem;
 
 public class CarController : MonoBehaviour
 {
-    public float speed = 1f;
+    public static CarController Instance;
+
     public Transform wheelFL;
     public Transform wheelFR;
     public Transform wheelRL;
     public Transform wheelRR;
-    public float wheelRotationSpeed = 90f;
-    public float laneChangeDuration = 0.5f;
-    public float wheelTurnAngle = 30f;
-    public float tiltAngle = 10f;
 
-    private readonly float[] lanes = { -7f, 0f, 7f };
+    [SerializeField]
+    private float currentSpeed = 2.5f;
+    [SerializeField]
+    private float currentDistance = 0;
+
+    private readonly float wheelRotationBaseSpeed = 90f;
+
+    [SerializeField]
+    private float boostDuration = 2f;
+    [SerializeField]
+    private float laneChangeDuration = 1f;
+
+    private readonly float tiltAngle = 10f;
+
+    private readonly float[] lanes = { -8f, 0f, 8f };
     private int currentLaneIndex = 1;
+    private int currentLaneChangeCount = 0;
     private bool isMobile = false;
-    private bool isChangingLane = false;
+    public bool isChangingLane = false;
+    private bool isGamePlayable = false;
+    private Coroutine speedCoroutine;
+    public bool isBoostActive = false;
+    [SerializeField]
+    private float distanceBoost = 0f;
+    [SerializeField]
+    private float baseDistance = 0f;
+    [SerializeField]
+    private bool isSliding = false;
+    private readonly float slidingTime = 0.8f;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
 
     private void Start()
     {
         isMobile = Application.isMobilePlatform;
+
+        currentDistance = 0;
+        currentLaneChangeCount = 0;
     }
 
     private void Update()
     {
-        transform.Translate(Vector3.right * speed * Time.deltaTime);
+        if (!isGamePlayable)
+            return;
+
+        float distancePerFrame = currentSpeed * Time.deltaTime;
+        baseDistance += distancePerFrame;
+
+        currentDistance += distancePerFrame * (1 + distanceBoost);
+
+        transform.Translate(distancePerFrame * Vector3.right);
 
         RotateWheels();
 
@@ -42,7 +90,9 @@ public class CarController : MonoBehaviour
 
     private void RotateWheels()
     {
-        float rotationAngle = wheelRotationSpeed * Time.deltaTime;
+        float rotationSpeed = wheelRotationBaseSpeed * (currentSpeed / 3.5f);
+        float rotationAngle = rotationSpeed * Time.deltaTime;
+
         if (wheelFL) wheelFL.Rotate(Vector3.right, rotationAngle);
         if (wheelFR) wheelFR.Rotate(Vector3.right, rotationAngle);
         if (wheelRL) wheelRL.Rotate(Vector3.right, rotationAngle);
@@ -51,19 +101,30 @@ public class CarController : MonoBehaviour
 
     private void HandleMobileSwipe()
     {
-        if (Touchscreen.current.primaryTouch.press.isPressed)
-        {
-            Vector2 swipeDelta = Touchscreen.current.primaryTouch.delta.ReadValue();
+        float swipeThreshold = 50f;
 
-            if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y))
+        if (
+            !GameManager.Instance.menuPanel.activeSelf && 
+            !GameManager.Instance.settingsPanel.activeSelf && 
+            !GameManager.Instance.creditsPanel.activeSelf && 
+            !GameManager.Instance.controlsPanel.activeSelf &&
+            !isSliding
+            )
+        {
+            if (Touchscreen.current.primaryTouch.press.isPressed)
             {
-                if (swipeDelta.x > 0)
+                Vector2 swipeDelta = Touchscreen.current.primaryTouch.delta.ReadValue();
+
+                if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y) && Mathf.Abs(swipeDelta.x) > swipeThreshold)
                 {
-                    ChangeLane(1);
-                }
-                else
-                {
-                    ChangeLane(-1);
+                    if (swipeDelta.x > 0)
+                    {
+                        ChangeLane(1);
+                    }
+                    else
+                    {
+                        ChangeLane(-1);
+                    }
                 }
             }
         }
@@ -71,13 +132,33 @@ public class CarController : MonoBehaviour
 
     private void HandleKeyboardInput()
     {
-        if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
+        if (
+            !GameManager.Instance.menuPanel.activeSelf && 
+            !GameManager.Instance.settingsPanel.activeSelf && 
+            !GameManager.Instance.creditsPanel.activeSelf && 
+            !GameManager.Instance.controlsPanel.activeSelf &&
+            !isSliding
+            )
         {
-            ChangeLane(1);
+            if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
+            {
+                ChangeLane(1);
+            }
+            else if (Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.aKey.wasPressedThisFrame)
+            {
+                ChangeLane(-1);
+            }
         }
-        else if (Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.aKey.wasPressedThisFrame)
+    }
+
+    public void HandleExternalLaneChange(int direction)
+    {
+        if (!isGamePlayable || isSliding || isChangingLane)
+            return;
+
+        if (direction == 1 || direction == -1)
         {
-            ChangeLane(-1);
+            ChangeLane(direction);
         }
     }
 
@@ -89,15 +170,19 @@ public class CarController : MonoBehaviour
         {
             currentLaneIndex = newLaneIndex;
             StartCoroutine(SmoothChangeLane(lanes[newLaneIndex]));
+            currentLaneChangeCount++;
         }
     }
 
     private IEnumerator SmoothChangeLane(float targetX)
     {
+        AudioManager.Instance.PlayTiresSound();
+
         isChangingLane = true;
 
         Vector3 startPosition = transform.position;
-        Vector3 targetPosition = new Vector3(targetX, startPosition.y, startPosition.z);
+        float initialZ = startPosition.z;
+        Vector3 targetPosition = new (targetX, startPosition.y, startPosition.z);
 
         float elapsedTime = 0f;
 
@@ -106,14 +191,16 @@ public class CarController : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / laneChangeDuration;
 
+            float dynamicZ = initialZ + currentSpeed * elapsedTime;
+
             transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+            transform.position = new (transform.position.x, transform.position.y, dynamicZ);
 
             float tilt = Mathf.Sin(t * Mathf.PI) * tiltAngle * Mathf.Sign(targetX - startPosition.x);
             transform.rotation = Quaternion.Euler(0, -90f + tilt, tilt / 10f);
 
             float halfDuration = laneChangeDuration / 2f;
-            float wheelTurnY = -270f;
-
+            float wheelTurnY;
             if (elapsedTime <= halfDuration)
             {
                 wheelTurnY = Mathf.Lerp(
@@ -138,13 +225,94 @@ public class CarController : MonoBehaviour
             yield return null;
         }
 
-        transform.position = targetPosition;
-        transform.rotation = Quaternion.Euler(0, -90f, 0);
-
+        transform.SetPositionAndRotation(new (targetPosition.x, transform.position.y, transform.position.z), Quaternion.Euler(0, -90f, 0));
         if (wheelFL) wheelFL.localRotation = Quaternion.Euler(wheelFL.localRotation.eulerAngles.x, -270f, 0);
         if (wheelFR) wheelFR.localRotation = Quaternion.Euler(wheelFR.localRotation.eulerAngles.x, -270f, 0);
 
         isChangingLane = false;
     }
 
+    private IEnumerator IncreaseSpeedOverTime()
+    {
+        while (isGamePlayable)
+        {
+            yield return new WaitForSeconds(1f);
+            currentSpeed = Mathf.Clamp(currentSpeed + 0.2f, 0f, 90f);
+        }
+    }
+
+    public void UpdateHandling(float newHandling)
+    {
+        laneChangeDuration = Mathf.Clamp(newHandling, 0.1f, 1f);
+    }
+
+    public void UpdateBoostDuration(float newDuration) => boostDuration = newDuration;
+
+    public void StartSpeedBoost()
+    {
+        if (isBoostActive) return;
+
+        currentSpeed += 8f;
+        isBoostActive = true;
+
+        BoostManager.Instance.StartBoostEffect(boostDuration);
+
+        Invoke(nameof(EndSpeedBoost), boostDuration);
+    }
+
+    private void EndSpeedBoost()
+    {
+        currentSpeed -= 8f;
+        isBoostActive = false;
+    }
+
+    public void SetSliding()
+    {
+        if (!isSliding)
+        {
+            StartCoroutine(SlidingCoroutine());
+        }
+    }
+
+    private IEnumerator SlidingCoroutine()
+    {
+        isSliding = true;
+        IceObstacleManager.Instance.StartIceObstacleEffect(slidingTime);
+        yield return new WaitForSeconds(slidingTime);
+        isSliding = false;
+    }
+
+    public float GetCurrentDistance() => currentDistance;
+
+    public float GetBaseDistance() => baseDistance;
+
+    public float GetDistanceBoost() => distanceBoost;
+
+    public int GetCurrentLaneChangeCount() => currentLaneChangeCount;
+
+    public void ResetCurrentDistance() => currentDistance = 0f;
+
+    public void ResetCurrentLaneChangeCount() => currentLaneChangeCount = 0;
+
+    public void SetDistanceBoost(float newBoost) => distanceBoost = newBoost;
+
+    public void IncreaseDistanceBoost(float boost) => distanceBoost += boost;
+
+    public void ResetIsSliding() => isSliding = false;
+
+    public void ResumeController()
+    {
+        isGamePlayable = true;
+        speedCoroutine = StartCoroutine(IncreaseSpeedOverTime());
+    }
+
+    public void PauseController()
+    {
+        isGamePlayable = false;
+        if (speedCoroutine != null)
+        {
+            StopCoroutine(speedCoroutine);
+            speedCoroutine = null;
+        }
+    }
 }
